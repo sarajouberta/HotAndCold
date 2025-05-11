@@ -41,7 +41,7 @@ void GameLayer::init() {
 	textCollected->content = to_string(collected);
 
 	
-	background = new Background("res/fondo_2.png", WIDTH * 0.5, HEIGHT * 0.5, -1, game);
+	background = new Background("res/fondo_hierba.png", WIDTH * 0.5, HEIGHT * 0.5, 0, game);  //CAMBIO A VELOCIDAD 0 PARA PROBAR ESTÁTICO
 	backgroundPoints = new Actor("res/icono_puntos.png",
 		WIDTH * 0.85, HEIGHT * 0.05, 24, 24, game);
 	//ampliación: mostrar contador recoletables
@@ -58,7 +58,8 @@ void GameLayer::init() {
 	//c++: siempre hacer el cast explícito
 
 	//cargar currentLevel, ya no hardcodeado
-	loadMap("res/" + to_string(game->currentLevel) + ".txt");
+	loadMap("res/" + to_string(game->currentLevel) + ".txt");   //comentado para probar con un mapa de prueba !!!!!!!
+	//loadMap("res/prueba.txt");
 }
 
 void GameLayer::loadMap(string name) {
@@ -162,7 +163,23 @@ void GameLayer::loadMapObject(char character, float x, float y)
 
 		}
 		case '#': {
-			Tile* tile = new Tile("res/bloque_tierra.png", x, y, game);
+			Tile* tile = new Tile("res/arbusto.png", x, y, game);
+			// modificación para empezar a contar desde el suelo.
+			tile->y = tile->y - tile->height / 2;
+			tiles.push_back(tile);
+			space->addStaticActor(tile);
+			break;
+		}
+		case 'H': {
+			Tile* tile = new Tile("res/hierba_chocografia.png", x, y, game);         //PRUEBAS TILES DE CAMUFLAJE PARA LA CHOCOGRAFÍA
+			// modificación para empezar a contar desde el suelo.
+			tile->y = tile->y - tile->height / 2;
+			tiles.push_back(tile);
+			space->addStaticActor(tile);
+			break;
+		}
+		case 'G': {
+			Tile* tile = new Tile("res/grass_tile.png", x, y, game);          //se camufla mejor la H
 			// modificación para empezar a contar desde el suelo.
 			tile->y = tile->y - tile->height / 2;
 			tiles.push_back(tile);
@@ -500,27 +517,27 @@ void GameLayer::draw() {
 	for (auto const& tile : tiles) {
 		tile->draw(scrollX, scrollY);
 	}
-	for (auto const& desTile : destructibleTiles) {
-		desTile->draw(scrollX, scrollY);
-	}
+	//for (auto const& desTile : destructibleTiles) {
+		//desTile->draw(scrollX, scrollY);
+	//}
 
-	for (auto const& projectile : projectiles) {
-		projectile->draw(scrollX, scrollY);
-	}
+	//for (auto const& projectile : projectiles) {
+		//projectile->draw(scrollX, scrollY);
+	//}
 	//pintar Copa después de tiles, detrás del jugador
-	cup->draw(scrollX, scrollY);
+	//cup->draw(scrollX, scrollY);
 
 	//ampli: poner punto de salvar partida
-	salvar->draw(scrollX, scrollY);
+	//salvar->draw(scrollX, scrollY);
 
 	//ampli: dibujar recolectables
-	for (auto const& coll : collectibleItems) {
-		coll->draw(scrollX, scrollY);
-	}
+	//for (auto const& coll : collectibleItems) {
+		//coll->draw(scrollX, scrollY);
+	//}
 	//ampli: dibujar enemigos "saltables"
-	for (auto const& jumpable : jumpableMonsters) {
-		jumpable->draw(scrollX, scrollY);
-	}
+	//for (auto const& jumpable : jumpableMonsters) {
+		//jumpable->draw(scrollX, scrollY);
+	//}
 
 	player->draw(scrollX, scrollY);
 	for (auto const& enemy : enemies) {
