@@ -8,11 +8,11 @@ Space::Space(float gravity) {
 
 void Space::update() {
 	for (auto const& actor : dynamicActors) {
-		actor->vy = actor->vy + gravity;
+		//actor->vy = actor->vy + gravity;
 		// máxima velocidad de caída por gravedad
-		if (actor->vy > 20) {
-			actor->vy = 20;
-		}
+		//if (actor->vy > 20) {
+			//actor->vy = 20;
+		//} //Retiro apliación de gravedad y límite vertical
 
         // Aun no se han detectado choques
         actor->collisionDown = false;

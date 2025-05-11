@@ -24,7 +24,7 @@ void GameLayer::init() {
 	buttonJump = new Actor("res/boton_salto.png", WIDTH * 0.9, HEIGHT * 0.55, 100, 100, game);
 	buttonShoot = new Actor("res/boton_disparo.png", WIDTH * 0.75, HEIGHT * 0.83, 100, 100, game);
 
-	space = new Space(1);
+	space = new Space(0); //Pongo la gravedad en 0, pera retirar la gravedad vertical
 	scrollX = 0;
 	scrollY = 0;  //añadir scrollY para ampliación
 	tiles.clear();
@@ -228,13 +228,14 @@ void GameLayer::processControls() {
 
 	// Eje Y
 	if (controlMoveY > 0) {
-	
+		player->moveY(1);
 	}
 	else if (controlMoveY < 0) {
-		player->jump();
+		//player->jump(); //Desactivo el salto en el eje Y
+		player->moveY(-1); //Reactivo el movimiento vertical hacia arriba
 	}
 	else {
-
+		player->moveY(0); //Reactivo movimiento vertical hacia abajo
 	}
 }
 
