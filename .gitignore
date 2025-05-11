@@ -1,32 +1,96 @@
-# Prerequisites
-*.d
+## Archivos de configuración de usuario (no esenciales)
+.vscode/
+*.code-workspace
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+## Carpetas comunes de Visual Studio
+.vs/
+Debug/
+Release/
+x64/
+x86/
+[Bb]uild*/
+[Bb]in/
+[Oo]bj/
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
+## Archivos generados por compilación
+*.exe
 *.dll
+*.lib
+*.pdb
+*.ipch
+*.obj
+*.o
+*.log
+*.tlog
+*.tmp
+*.cache
+*.db
+*.ilk
+*.exp
+*.iobj
+*.ipdb
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
+*.ncb
 
-# Fortran module files
+## Archivos relacionados con C/C++ y Fortran
+*.pch
+*.gch
 *.mod
 *.smod
-
-# Compiled Static libraries
-*.lai
-*.la
+*.d
+*.slo
+*.lo
 *.a
-*.lib
-
-# Executables
-*.exe
+*.la
+*.lai
 *.out
 *.app
+*.so
+*.dylib
+
+## Otros archivos temporales
+*.bak
+*.old
+*.swp
+*.~*
+~$*
+
+## Archivos de paquetes de NuGet
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+
+## Archivos de dependencias de CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+## Carpetas de pruebas temporales
+TestResults/
+*.trx
+
+## Visual Studio Code Workspace Storage
+.vscode-test/
+
+## Archivos de entorno local
+.env
+*.local
+
+## Archivos de análisis y cobertura
+*.coverage
+*.coveragexml
+*.codecov
+
+## Archivos de publicación
+*.publish.xml
+publish/
+
+# ¡FIN!
