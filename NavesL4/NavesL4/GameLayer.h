@@ -74,7 +74,7 @@ public:
 	list<Enemy*> enemies;
 	list<Projectile*> projectiles;
 	bool controlContinue = false; //encargado de poner/quitar pausa
-	bool controlShoot = false;
+	bool controlPeck = false;  //cambiado space x picar suelo
 	int controlMoveY = 0;
 	int controlMoveX = 0;
 

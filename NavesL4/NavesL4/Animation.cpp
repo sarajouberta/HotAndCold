@@ -55,6 +55,11 @@ bool Animation::update() {
 	return false; // luego lo cambiamos
 }
 
+bool Animation::hasEnded() {
+	return !loop && currentFrame >= totalFrames - 1;
+}
+
+
 void Animation::draw(float x, float y) {
 
 	// Donde se va a pegar en el renderizador

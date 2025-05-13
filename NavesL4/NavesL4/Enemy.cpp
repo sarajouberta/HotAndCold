@@ -17,11 +17,13 @@ Enemy::Enemy(float x, float y, Game* game)
 	vx = vxIntelligence;
 
 }
+/*                                               temporalmente comentado para probar animaciones
 
 void Enemy::update() {
 	// Actualizar la animación
 	bool endAnimation = animation->update();
 
+	
 	// Acabo la animación, no sabemos cual
 	if (endAnimation) {
 		// Estaba muriendo
@@ -74,7 +76,7 @@ void Enemy::impacted() {
 		state = game->stateDying;
 	}
 }
-
+*/
 
 void Enemy::draw(float scrollX, float scrollY) {
 	animation->draw(x - scrollX, y - scrollY);

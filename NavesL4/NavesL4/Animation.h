@@ -19,6 +19,9 @@ public:
 	int totalFrames;
 	Game* game;
 
+	//se añade método para indicar que una animación no repetitiva ha terminado:
+	bool hasEnded();
+
 	// Auxiliares
 	SDL_Texture* texture; // imagen
 	SDL_Rect source; // Parte de la imagen que se recorta del fichero

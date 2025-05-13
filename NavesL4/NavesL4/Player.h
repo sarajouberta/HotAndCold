@@ -9,29 +9,47 @@ class Player : public Actor
 {
 public:
 	Player(float x, float y, Game* game);
-	Projectile* shoot();
+	//Projectile* shoot();
 	void update();
-	void jump();
+	void peck();  //picar el suelo
+
 	void moveX(float axis);
 	void moveY(float axis);
 	void draw(float scrollX = 0, float scrollY = 0) override; // Va a sobrescribir
-	void loseLife();
-	int lifes = 3;
-	int invulnerableTime = 0;
-	bool onAir;
+	
+	//En lugar de vidas, habrá un temporizador en el juego
+
 	int orientation;
 	int state;
+
+	//velocidades para caminar/correr:
+	//int walkingSpeed = 3;
+	float speed;
+	int runningSpeed = 6;
+
 	Animation* aIdleRight;
 	Animation* aIdleLeft;
-	Animation* aJumpingRight;
-	Animation* aJumpingLeft;
+	Animation* aIdleUp;
+	Animation* aIdleDown;
+	
 	Animation* aRunningRight;
 	Animation* aRunningLeft;
-	Animation* aShootingRight;
-	Animation* aShootingLeft;
-	Animation* animation; // Referencia a la animación mostrada
-	Audio* audioShoot;
-	int shootCadence = 30;
-	int shootTime = 0;
+	Animation* aRunningUp;
+	Animation* aRunningDown;
+
+	//Animation* aPeckingDown;  //picotazo hacia abajo
+	Animation* aPeckingRight;
+	Animation* aPeckingLeft;
+
+	//posiciones estáticas:
+	Animation* aStandingRight;
+	Animation* aStandingLeft;
+	Animation* aStandingUp;
+	Animation* aStandingDown;
+
+	Animation* animation; //referencia a la animación mostrada
+	//Audio* audioPeck;
+	//Audio* audioPickingChocoGraphy;
+	
 };
 

@@ -220,17 +220,7 @@ void GameLayer::processControls() {
 		pause = false;
 		controlContinue = false;
 	}
-	// Disparar
-	if (controlShoot) {
-		Projectile* newProjectile = player->shoot();
-		if (newProjectile != NULL) {
-			space->addDynamicActor(newProjectile);
-			projectiles.push_back(newProjectile);
 
-			//controlShoot = false; x si queremos que botón se deje pulsado para repetir accion
-		}
-
-	}
 
 	// Eje X
 	if (controlMoveX > 0) {
@@ -263,10 +253,7 @@ void GameLayer::update() {
 	if (pause) {  //para q el juego se detenga si pausa
 		return;
 	}
-	//ampli: tiles destructibles
-	for (auto const& desTile : destructibleTiles) {
-		desTile->update();
-	}
+	
 
 	// Nivel superado: colisión especial: se acaba el juego
 	//detectar cuando el player y la cup chocan
@@ -292,10 +279,6 @@ void GameLayer::update() {
 		savedY = player->y;
 	}
 
-	// Jugador se cae
-	if (player->y > HEIGHT + 80) {
-		init();
-	}
 
 	space->update();
 	background->update();
@@ -307,12 +290,13 @@ void GameLayer::update() {
 	}
 
 	for (auto const& enemy : enemies) {
-		enemy->update();
+		//enemy->update();                                        TEMPORALMENTE COMENTADO PARA PROBAR ANIMACIONES PLAYER
 	}
 	for (auto const& projectile : projectiles) {
 		projectile->update();
 	}
 
+	/*
 	// Colisiones
 	for (auto const& enemy : enemies) {
 		if (player->isOverlap(enemy)) {
@@ -325,7 +309,7 @@ void GameLayer::update() {
 	}
 
 	// Colisiones , Enemy - Projectile , player - elementos recoletables, player - tile destructible, player-jumpableMonster
-
+	
 	list<Enemy*> deleteEnemies;
 	list<Projectile*> deleteProjectiles;
 	list<CollectibleItem*> deleteCollectibles;  //ampli plataformas: el recolectables
@@ -480,6 +464,7 @@ void GameLayer::update() {
 
 
 	cout << "update GameLayer" << endl;
+	*/
 }
 
 void GameLayer::calculateScroll() {
@@ -589,8 +574,9 @@ void GameLayer::keysToControls(SDL_Event event) {
 		case SDLK_s: // abajo
 			controlMoveY = 1;
 			break;
-		case SDLK_SPACE: // dispara
-			controlShoot = true;
+		case SDLK_SPACE: //space para picar el suelo en busca de la chocografía
+			controlPeck = true;
+			player->peck(); //para que cambie al estado de picar
 			break;
 		}
 
@@ -621,7 +607,7 @@ void GameLayer::keysToControls(SDL_Event event) {
 			}
 			break;
 		case SDLK_SPACE: // dispara
-			controlShoot = false;
+			controlPeck = false;
 			break;
 		}
 	}
@@ -635,7 +621,7 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
 		controlContinue = true; //eliminar pausa con clic en la pantalla
 		if (buttonShoot->containsPoint(motionX, motionY)) {
-			controlShoot = true;
+			controlPeck = true;
 		}
 		//
 		if (buttonJump->containsPoint(motionX, motionY)) {
@@ -661,7 +647,7 @@ void GameLayer::mouseToControls(SDL_Event event) {
 		}
 		//if: x si se sale el puntero del botón: tiene que parar
 		if (buttonShoot->containsPoint(motionX, motionY) == false) {
-			controlShoot = false;
+			controlPeck = false;
 		//si quieres q haya que darle cada vez q se dispara: poner a false en cuanto se pulse, para tner que reiniciar el pulsar (true es justo al pulsarse: y dispara))
 		}
 		//
@@ -672,7 +658,7 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	// Cada vez que levantan el click
 	if (event.type == SDL_MOUSEBUTTONUP) {
 		if (buttonShoot->containsPoint(motionX, motionY)) {
-			controlShoot = false;
+			controlPeck = false;
 		}
 		//
 		if (buttonJump->containsPoint(motionX, motionY)) {
@@ -705,10 +691,10 @@ void GameLayer::gamePadToControls(SDL_Event event) {
 	}
 
 	if (buttonA) {
-		controlShoot = true;
+		controlPeck = true;
 	}
 	else {
-		controlShoot = false;
+		controlPeck = false;
 	}
 
 	if (buttonB) {
