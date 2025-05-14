@@ -1,4 +1,5 @@
 #include "GameLayer.h"
+#include <algorithm> //para std::clamp en el control de scroll
 
 GameLayer::GameLayer(Game* game) : Layer(game) {
 	//llama al constructor del padre : Layer(renderer)
@@ -247,13 +248,11 @@ void GameLayer::processControls() {
 }
 
 void GameLayer::update() {
-	
 	/* Hemos declarado que el juego se inicia con pause=true, por lo que comienza pausado 
 	  y con un mensaje de explicación.*/
 	if (pause) {  //para q el juego se detenga si pausa
 		return;
 	}
-	
 
 	// Nivel superado: colisión especial: se acaba el juego
 	//detectar cuando el player y la cup chocan
@@ -279,6 +278,8 @@ void GameLayer::update() {
 		savedY = player->y;
 	}
 
+	//para controlar los límites del jugador antes de actualizar su posición:
+	limitPlayerPosition();
 
 	space->update();
 	background->update();
@@ -466,33 +467,56 @@ void GameLayer::update() {
 	cout << "update GameLayer" << endl;
 	*/
 }
-
+/*Para hacer que el jugador pueda hacer scroll para ver las partes del mapa que no caben en la pantalla:
+* - los límites no son relativos: el tamaño del mapa es fijo (600x400)
+* - la "cámara" jugador tiene que adaptarse al movimiento, pero sin pasar los límites en 4 direcciones
+* - se mantiene el márgen en el que pa pantalla no se mueve, con 0.3/0.7 (0.5 en ambos==jugador siempre centrado)
+* - std::clamp manual(tengo C++14): limitar máx y mín oara que player no se salga de límites
+*/
 void GameLayer::calculateScroll() {
-	// limite izquierda: a partir del ancho + 
-	if (player->x > WIDTH * 0.3) {
-		if (player->x - scrollX < WIDTH * 0.3) {
-			scrollX = player->x - WIDTH * 0.3;
-		}
+	// Límites de la cámara
+	int leftLimit = 0;
+	int topLimit = 0;
+	int rightLimit = BACKGROUND_WIDTH - WINDOW_WIDTH;  // 600 - 480 = 120
+	int bottomLimit = BACKGROUND_HEIGHT - WINDOW_HEIGHT;  // 400 - 320 = 80
+
+	// Limitar el desplazamiento horizontal (scrollX)
+	if (player->x - scrollX < WINDOW_WIDTH * 0.3) {  // Si el jugador está cerca del borde izquierdo
+		scrollX = player->x - WINDOW_WIDTH * 0.3;
 	}
-	// limite derecha
-	if (player->x < mapWidth - WIDTH * 0.3) {
-		if (player->x - scrollX > WIDTH * 0.7) {
-			scrollX = player->x - WIDTH * 0.7;
-		}
+	if (player->x - scrollX > WINDOW_WIDTH * 0.7) {  // Si el jugador está cerca del borde derecho
+		scrollX = player->x - WINDOW_WIDTH * 0.7;
 	}
-	// limite superior
-	if (player->y < HEIGHT * 0.3) {  //límite superior del mapa
-		if (player->y - scrollY < HEIGHT * 0.3) {
-			scrollY = player->y - HEIGHT * 0.3;
-		}
+
+	// Limitar el desplazamiento vertical (scrollY)
+	if (player->y - scrollY < WINDOW_HEIGHT * 0.3) {  // Si el jugador está cerca del borde superior
+		scrollY = player->y - WINDOW_HEIGHT * 0.3;
 	}
-	// limite inferior
-	if (player->y < mapHeight - HEIGHT * 0.3) {  //límite inferior del mapa
-		if (player->y - scrollY > HEIGHT * 0.7) {
-			scrollY = player->y - HEIGHT * 0.7;
-		}
+	if (player->y - scrollY > WINDOW_HEIGHT * 0.7) {  // Si el jugador está cerca del borde inferior
+		scrollY = player->y - WINDOW_HEIGHT * 0.7;
 	}
+
+	// Limitar el desplazamiento para que no se salga del fondo (600x400)
+	if (scrollX < leftLimit) scrollX = leftLimit;
+	if (scrollY < topLimit) scrollY = topLimit;
+	if (scrollX > rightLimit) scrollX = rightLimit;
+	if (scrollY > bottomLimit) scrollY = bottomLimit;
 }
+
+void GameLayer::limitPlayerPosition() {
+	const int MARGIN = 8;
+
+	int leftLimit = MARGIN;
+	int topLimit = 0;
+	int rightLimit = 600 - player->width;
+	int bottomLimit = 400 - player->height;
+
+	if (player->x < leftLimit) player->x = leftLimit;
+	if (player->x > rightLimit) player->x = rightLimit;
+	if (player->y < topLimit) player->y = topLimit;
+	if (player->y > bottomLimit) player->y = bottomLimit;
+}
+
 
 
 void GameLayer::draw() {

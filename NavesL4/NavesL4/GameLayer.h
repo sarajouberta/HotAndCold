@@ -39,9 +39,16 @@ public:
 
 	void loadMap(string name);
 	void loadMapObject(char character, float x, float y);
+
+	//cambio scroll: para moverse x el mapa (x grande que pantalla, pero con fondo fijo)
+	void limitPlayerPosition();
 	void calculateScroll();
 	float scrollX;
 	float scrollY;
+	const int BACKGROUND_WIDTH = 600;
+	const int BACKGROUND_HEIGHT = 400;
+	const int WINDOW_WIDTH = 480;
+	const int WINDOW_HEIGHT = 320;
 
 
 	//botón en el que se mostrará el mensaje y pause
