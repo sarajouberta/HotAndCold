@@ -7,3 +7,4 @@ public:
 	Tile(string filename, float x, float y, Game* game);
 };
 
+

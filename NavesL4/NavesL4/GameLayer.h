@@ -5,10 +5,10 @@
 #include "Background.h"
 
 #include "Enemy.h"
-#include "Projectile.h"
 #include "Text.h"
 #include "Tile.h"
-#include "Pad.h"
+#include "Chocography.h"
+#include "FriendMoguri.h"
 
 #include "Audio.h"
 #include "Space.h" // importar
@@ -16,11 +16,7 @@
 #include <fstream> // Leer ficheros
 #include <sstream> // Leer líneas / String
 #include <list>
-
-//ampliaciones:
-#include "CollectibleItem.h"
-#include "DestructibleTile.h"
-#include "JumpableMonster.h"
+#include "Pad.h"
 
 class GameLayer : public Layer
 {
@@ -33,9 +29,6 @@ public:
 	void keysToControls(SDL_Event event);
 
 	void mouseToControls(SDL_Event event); // USO DE MOUSE
-
-	//prueba gamepad: 
-	void gamePadToControls(SDL_Event event); // USO DE GAMEPAD
 
 	void loadMap(string name);
 	void loadMapObject(char character, float x, float y);
@@ -58,8 +51,6 @@ public:
 
 	//HUD: info al usuario
 	//Elementos de interfaz
-	SDL_GameController* gamePad;  //para prueba gamepad
-
 	Pad* pad;
 	Actor* buttonJump;
 	Actor* buttonShoot;
@@ -79,19 +70,18 @@ public:
 	Background* background;
 	Actor* backgroundPoints;
 	list<Enemy*> enemies;
-	list<Projectile*> projectiles;
+
+	list<FriendMoguri*> friends;
+
 	bool controlContinue = false; //encargado de poner/quitar pausa
 	bool controlPeck = false;  //cambiado space x picar suelo
 	int controlMoveY = 0;
 	int controlMoveX = 0;
 
 	Actor* backgroundCollectibles;
-	list<CollectibleItem*> collectibleItems;
+	list<Chocography*> chocographies;          //revisar CHOCOGRAFIAS
 	int collected = 0;
 	Text* textCollected;
-
-	//ampliación tiles destructibles
-	list<DestructibleTile*> destructibleTiles;
 
 	//ampliación: elemento para salvar punto de reinicio partida
 	Tile* salvar; 
@@ -99,7 +89,5 @@ public:
 	int savedX = 0;
 	int savedY = 0;
 
-	//ampliación enemigo "saltable"
-	list<JumpableMonster*> jumpableMonsters;
 };
 

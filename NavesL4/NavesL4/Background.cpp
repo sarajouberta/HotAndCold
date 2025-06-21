@@ -34,7 +34,7 @@ void Background::update() {
 
 void Background::draw(float scrollX, float scrollY) {
 	Actor::draw(); // llamar al metodo del hijo
-
+	/*
 	if (backgroundAux != NULL) {
 		// zona sin cubrir por la izquierda
 		if (x - width / 2 > 0) {
@@ -47,7 +47,7 @@ void Background::draw(float scrollX, float scrollY) {
 			backgroundAux->x = x + width;
 		}
 		backgroundAux->draw();
-	}
+	}*/
 
 }
 

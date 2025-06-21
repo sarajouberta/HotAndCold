@@ -7,5 +7,3 @@ public:
 	Pad(float x, float y, Game* game);
 	float getOrientationX(float clickX);
 };
-
-

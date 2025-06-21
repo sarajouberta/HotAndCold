@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Actor.h"
-#include "Projectile.h" 
 #include "Audio.h"
 #include "Animation.h" // incluir animacion 
 
