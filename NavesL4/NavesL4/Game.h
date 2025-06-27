@@ -14,6 +14,15 @@ using namespace std;
 #define HEIGHT 320
 
 #include "Layer.h"
+//#include "GameOverLayer.h"  //esro me estaba provocando 600 errores de compilación (ref cruzada)
+//lo pongo en el .cpp tras añadirlo como declaración adelantada:
+/* las declaraciones adelantadas sirven para decirle al compilador que la clase existe, sin tener q verla entera.
+* evita errores de dependencias circulares, que eran mi caso, y reducen acoplamiento entre clases
+* se usa para declarar punteros (como en este caso)pero evita añadir archivos pesados como el .h
+* (si se usan métodos, entonces se necesita el #include del .h)
+*/
+class GameLayer;
+class GameOverLayer;
 class Layer;
 
 class Game
@@ -53,5 +62,12 @@ public:
 	int const orientationLeft = 2;
 	int const orientationUp = 3;
 	int const orientationDown = 4;
+
+	//para acabar la partida cuando termine el temporizador:
+	//string state = "playing";   //cambiado tras añadir mejor una nueva layer de GameOver
+	//refe a la layer de game over
+	GameOverLayer* gameOverLayer;
+	//¡Cuidado! ya había variable de este tipo, solo q declarada como Layer* (pero instanciada como GameLayer())
+	//GameLayer* gameLayer; //también, para poder reiniciar el juego desde el final de partida
 
 };

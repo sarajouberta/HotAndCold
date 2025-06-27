@@ -78,6 +78,9 @@
     <ClCompile Include="Pad.cpp">
       <Filter>Archivos de origen\actores</Filter>
     </ClCompile>
+    <ClCompile Include="GameOverLayer.cpp">
+      <Filter>Archivos de origen\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -127,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="Pad.h">
       <Filter>Archivos de encabezado\actores</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverLayer.h">
+      <Filter>Archivos de encabezado\layers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

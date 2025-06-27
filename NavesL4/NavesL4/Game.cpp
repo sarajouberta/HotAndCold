@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "GameLayer.h"
 #include "MenuLayer.h"
+#include "GameOverLayer.h"
 
 Game::Game() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -17,6 +18,10 @@ Game::Game() {
 	menuLayer = new MenuLayer(this);
 	gameLayer = new GameLayer(this);
 	layer = menuLayer; // Pantalla INICIAL MENULAYER
+
+	//se añade layer game over:
+	//gameOverLayer = new GameOverLayer(this); //recive this (Game) para poder reiniciar partida
+
 
 	// fuentes
 	TTF_Init();
@@ -40,6 +45,17 @@ void Game::loop() {
 		layer->update();
 		// Dibujar
 		layer->draw();
+
+		//control del temporizador: si le llega "timeout" se termina la partida. CAMBIADO POR GAMEOVERLAYER
+		/*if (state == "timeout") {
+			SDL_Delay(1500); // pequeña pausa para mostrar el mensaje
+			layer = menuLayer; // volver al menú principal
+			state = "menu";    // actualizar el estado del juego
+		}
+		Cambiado por este flujo:
+		- GameLayer detecta que se acaba el tiempo: cambia game->layer = gameOverLayer
+		- GameOverLayer toma el control de entrada y dibujo.
+		- En los botones, puedes cambiar de nuevo a gameLayer (para reintentar) o menuLayer (para salir).*/
 
 
 		endTick = SDL_GetTicks();
