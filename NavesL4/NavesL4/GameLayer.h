@@ -56,7 +56,7 @@ public:
 	Actor* buttonShoot;
 	Text* textPoints;
 
-	//cuidado: tiene que añadirse en el Space: peta si no
+	//cuidado: tiene que añadirse en el Space: peta, si no
 	Tile* cup; // Elemento de final de nivel
 	Space* space;
 	int mapWidth;
@@ -89,5 +89,23 @@ public:
 	int savedX = 0;
 	int savedY = 0;
 
-};
+	//añadir cronometro al juego: Uint32 == 
+	Uint32 totalTime = 120000;
+	Uint32 initTime;
+	Uint32 passedTime; //para que sea temporizador, no cronómetro
+	Uint32 pauseTime;
+	Uint32 waitingTime = 3000; //3 segundos de pausa si se toca al moguri, de momento
+	bool activeTimer = true;
+	bool temporalPause = false;
+	Uint32 pauseInit = 0;
 
+	Text* textPauseMessage; //para que el mguri anuncie que le ha ayudado y comience la pausa
+	bool showPauseMessage = false;
+	Text* textTimer;
+
+	void updateTimer();
+
+	//para mostrar mensaje/pantalla de que se acabó en tiempo y, por tanto, la partida:
+	bool showGameOver;
+
+};

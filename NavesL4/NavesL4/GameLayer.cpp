@@ -18,6 +18,14 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 
 
 void GameLayer::init() {
+	//para mostrar el temportizador de la partida:
+	//iniciar y mostrar el cronómetro del juego:
+	initTime = SDL_GetTicks();  //muestra "Tiempo: mm:ss"
+	pauseTime = 0;
+
+	textTimer = new Text("hola", WIDTH * 0.20, HEIGHT * 0.04, game);
+	textTimer->content = "Tiempo: 02:00";                    //ya funciona el temporizador
+
 	pad = new Pad(WIDTH * 0.15, HEIGHT * 0.80, game);
 	//se crean los 2 botones a partir de actor xq son muy simples:
 	buttonJump = new Actor("res/boton_salto.png", WIDTH * 0.9, HEIGHT * 0.55, 100, 100, game);
@@ -28,9 +36,10 @@ void GameLayer::init() {
 	scrollY = 0;  //añadir scrollY para ampliación
 	tiles.clear();																					//REVISAR
 
-	audioBackground = new Audio("res/Ukule_Chocobo_IX.mp3", true);  
-	audioBackground->play();
+	//audioBackground = new Audio("res/Ukule_Chocobo_IX.mp3", true);  
+	//audioBackground->play();
 
+	//mostrar chocografías ¿?                                                                //REVISAR
 	points = 0;
 	textPoints = new Text("hola", WIDTH * 0.92, HEIGHT * 0.04, game);
 	textPoints->content = to_string(points);
@@ -224,12 +233,68 @@ void GameLayer::update() {
 	}
 
 	// Colisiones: COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
-	
-
+	////COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
+	for (auto const& friendMoguri : friends) {
+		if (player->isOverlap(friendMoguri)) {
+			if (!temporalPause) {
+				temporalPause = true;
+				//parar el movimiento del moguri¿? o poner otra animacion: REVISAR !!
+				activeTimer = false;
+				pauseInit = SDL_GetTicks();
+				pauseTime += waitingTime;
+				//mostrar mensaje del moguri:
+				textPauseMessage->content = "¡Amigo Moguri te ayuda! Tiempo detenido.";
+				showPauseMessage = true;
+			}
+		}
+	}
+	//actualizar el cronómetro:
+	updateTimer();
 
 	cout << "update GameLayer" << endl;
 	
 }
+
+void GameLayer::updateTimer() {
+	//si el temporizador está pausado por la ayuda del moguri:
+	if (temporalPause) {
+		if (SDL_GetTicks() - pauseInit >= waitingTime) {  //mirar si ha terminado la pausa
+			temporalPause = false;
+			activeTimer = true;
+			showPauseMessage = false;
+		}
+	}
+	//cuando no hay pausa activa:
+	if (activeTimer) {
+		passedTime = SDL_GetTicks() - initTime - pauseTime;
+		//se calcula tiempo restante:
+		int timeLeft = totalTime - passedTime;
+		if (timeLeft <= 0) { //si se agoó el tiempo
+			timeLeft = 0;
+			activeTimer = false;
+			//AÑADIR LÓGICA PARA TERMINAR EL JUEGO:									REVISARRRRRRRRRR
+			showGameOver = true;
+			pause = true; //se pausa el juego de fondo, además de mostrar el mensaje
+			//game->state = "timeout";   //cambiado por el cambio de layer
+			game->layer = game->gameOverLayer;
+		}
+
+		int sec = timeLeft / 1000;
+		int min = sec / 60;
+		sec = sec % 60;
+
+		stringstream ss;  //formato para mostrar el temporizador== MM:ss (algo así como StringBuilder)
+		ss << "Tiempo: ";
+		if (min < 10) ss << "0";
+		ss << min << ":";
+		if (sec < 10) ss << "0";
+		ss << sec;
+		//mostrar en la pantalla
+		textTimer->content = ss.str();
+	}
+}
+
+
 
 /*Para hacer que el jugador pueda hacer scroll para ver las partes del mapa que no caben en la pantalla:
 * - los límites no son relativos: el tamaño del mapa es fijo (600x400)
@@ -320,6 +385,14 @@ void GameLayer::draw() {
 
 	for (auto const& friendMoguri : friends) {
 		friendMoguri->draw(scrollX, scrollY);
+	}
+
+	//mostrar temporizador:
+	textTimer->draw();
+
+	//mostrar o no mensaje del moguri al empezar la pausa (tras colisión):
+	if (showPauseMessage) {
+		textPauseMessage->draw();
 	}
 
 	backgroundPoints->draw();
