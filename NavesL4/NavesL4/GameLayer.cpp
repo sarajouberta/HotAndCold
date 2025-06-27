@@ -276,7 +276,7 @@ void GameLayer::updateTimer() {
 			showGameOver = true;
 			pause = true; //se pausa el juego de fondo, además de mostrar el mensaje
 			//game->state = "timeout";   //cambiado por el cambio de layer
-			game->layer = game->gameOverLayer;
+			//game->layer = game->gameOverLayer;
 		}
 
 		int sec = timeLeft / 1000;

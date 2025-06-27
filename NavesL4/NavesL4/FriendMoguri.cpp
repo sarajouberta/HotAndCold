@@ -6,10 +6,10 @@ FriendMoguri::FriendMoguri(float x, float y, Game* game)
 	state = game->stateMoving;
 
 	aMoving = new Animation("res/moguri_movimiento.png", width, height,
-		108, 40, 6, 3, true, game);
+		46, 31, 5, 2, true, game);
 	animation = aMoving;
 
-	vx = 1;
+	vx = 0;  //quiero que se mueva solo en el sitio
 	/*vxIntelligence = -1;
 	vx = vxIntelligence;*/
 
