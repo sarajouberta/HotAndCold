@@ -4,7 +4,7 @@
 #include "Player.h"
 #include "Background.h"
 
-#include "Enemy.h"
+#include "AnnoyingEnemy.h"
 #include "Text.h"
 #include "Tile.h"
 #include "Chocography.h"
@@ -52,24 +52,22 @@ public:
 	//HUD: info al usuario
 	//Elementos de interfaz
 	Pad* pad;
-	Actor* buttonJump;
+	Actor* buttonJump;                                                              //REVISAR
 	Actor* buttonShoot;
-	Text* textPoints;
 
 	//cuidado: tiene que añadirse en el Space: peta, si no
-	Tile* cup; // Elemento de final de nivel
+	Tile* cup; //elemento de final de nivel
 	Space* space;
 	int mapWidth;
 	int mapHeight;
 	list<Tile*> tiles;
 
 	Audio* audioBackground;
-	int points;
-	int newEnemyTime = 0;
+	int newEnemyTime = 0;                                //revisar
 	Player* player;
 	Background* background;
-	Actor* backgroundPoints;
-	list<Enemy*> enemies;
+	
+	list<AnnoyingEnemy*> enemies;
 
 	list<FriendMoguri*> friends;
 
@@ -83,7 +81,7 @@ public:
 	int collected = 0;
 	Text* textCollected;
 
-	//ampliación: elemento para salvar punto de reinicio partida
+	//ampliación: elemento para salvar punto de reinicio partida                      REVISAR!!!!!
 	Tile* salvar; 
 	bool savedPoint = false;
 	int savedX = 0;
@@ -99,11 +97,17 @@ public:
 	bool temporalPause = false;
 	Uint32 pauseInit = 0;
 
-	Text* textPauseMessage; //para que el mguri anuncie que le ha ayudado y comience la pausa
-	bool showPauseMessage = false;
-	Text* textTimer;
+	/*bool para distinguir la pausa inicial(para que el temporizador no empiece hasta que desaparezca el mensaje
+	de "cómo jugar"): */
+	bool firstStart = true;
 
+	Text* textMoguriPauseMessage; //para que el mguri anuncie que le ha ayudado y comience la pausa
+	bool showMoguriPauseMessage = false;
+
+	//para temporizador:
+	Text* textTimer;
 	void updateTimer();
+	Actor* backgroundTimer;
 
 	//para mostrar mensaje/pantalla de que se acabó en tiempo y, por tanto, la partida:
 	bool showGameOver;

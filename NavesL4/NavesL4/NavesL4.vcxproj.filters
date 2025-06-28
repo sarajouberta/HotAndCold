@@ -48,7 +48,7 @@
     <ClCompile Include="Background.cpp">
       <Filter>Archivos de origen\actores</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
+    <ClCompile Include="EnemyOld.cpp">
       <Filter>Archivos de origen\actores</Filter>
     </ClCompile>
     <ClCompile Include="Text.cpp">
@@ -81,6 +81,9 @@
     <ClCompile Include="GameOverLayer.cpp">
       <Filter>Archivos de origen\layers</Filter>
     </ClCompile>
+    <ClCompile Include="AnnoyingEnemy.cpp">
+      <Filter>Archivos de origen\actores</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -101,7 +104,7 @@
     <ClInclude Include="Background.h">
       <Filter>Archivos de encabezado\actores</Filter>
     </ClInclude>
-    <ClInclude Include="Enemy.h">
+    <ClInclude Include="EnemyOld.h">
       <Filter>Archivos de encabezado\actores</Filter>
     </ClInclude>
     <ClInclude Include="Text.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="GameOverLayer.h">
       <Filter>Archivos de encabezado\layers</Filter>
+    </ClInclude>
+    <ClInclude Include="AnnoyingEnemy.h">
+      <Filter>Archivos de encabezado\actores</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

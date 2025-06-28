@@ -3,28 +3,33 @@
 
 GameLayer::GameLayer(Game* game) : Layer(game) {
 	//llama al constructor del padre : Layer(renderer)
-	
 
 	/* Variables pausa/ message: Normalmente esto lo hacemos en el método init() , 
 	pero en este caso nos viene mejor hacerlo en el constructor
 	para evitar que cuando se reinicie el juego aparezca siempre con los mismos valores,
 	nos aportará algo más de control*/
+
+	firstStart = true; //distingue pausa inicial para controlar cuándo se inicia el temporizador
 	pause = true;
-	message = new Actor("res/mensaje_como_jugar.png", WIDTH * 0.5, HEIGHT * 0.5,
+	message = new Actor("res/hotNCold_como_jugar.png", WIDTH * 0.5, HEIGHT * 0.5,
 		WIDTH, HEIGHT, game);
 	//message: apunta al “mensaje actual”, pero puede cambiarse en cualquier momento, instanciando otro actor
+
+	textMoguriPauseMessage = new Text("hola", WIDTH * 0.5, HEIGHT * 0.5, game);  //mensaje colisión con moguri
+	textMoguriPauseMessage->content = ""; // vacía por defecto
+
 	init();
 }
 
 
 void GameLayer::init() {
-	//para mostrar el temportizador de la partida:
-	//iniciar y mostrar el cronómetro del juego:
-	initTime = SDL_GetTicks();  //muestra "Tiempo: mm:ss"
+
+	//iniciar y mostrar el cronómetro del juego: se reinicia en otro lugar para que empiece tras cómo jugar""
+	//initTime = SDL_GetTicks();  //muestra "Tiempo: mm:ss"
 	pauseTime = 0;
 
 	textTimer = new Text("hola", WIDTH * 0.20, HEIGHT * 0.04, game);
-	textTimer->content = "Tiempo: 02:00";                    //ya funciona el temporizador
+	textTimer->content = "02:00";                    //ya funciona el temporizador
 
 	pad = new Pad(WIDTH * 0.15, HEIGHT * 0.80, game);
 	//se crean los 2 botones a partir de actor xq son muy simples:
@@ -39,21 +44,17 @@ void GameLayer::init() {
 	//audioBackground = new Audio("res/Ukule_Chocobo_IX.mp3", true);  
 	//audioBackground->play();
 
-	//mostrar chocografías ¿?                                                                //REVISAR
-	points = 0;
-	textPoints = new Text("hola", WIDTH * 0.92, HEIGHT * 0.04, game);
-	textPoints->content = to_string(points);
-
+	//mostrar chocografías:      
 	collected = 0;
 	textCollected = new Text("hola", WIDTH * 0.67, HEIGHT * 0.04, game);
 	textCollected->content = to_string(collected);
-
 	
 	background = new Background("res/fondo_hierba.png", WIDTH * 0.5, HEIGHT * 0.5, 0, game);  //CAMBIO A VELOCIDAD 0 PARA PROBAR ESTÁTICO
-	backgroundPoints = new Actor("res/icono_puntos.png",
-		WIDTH * 0.85, HEIGHT * 0.05, 24, 24, game);
-	//ampliación: mostrar contador recoletables
-	backgroundCollectibles = new Actor("res/icono_recolectable.png",
+	//icono temporizador:
+	backgroundTimer = new Actor("res/timer_icon.png",
+		WIDTH * 0.1, HEIGHT * 0.05, 45, 48, game);
+	//recolectables: chocografías:
+	backgroundCollectibles = new Actor("res/chocography_icon.png",
 		WIDTH * 0.6, HEIGHT * 0.05, 25, 25, game);
 																							//REVISAR
 	enemies.clear(); // Vaciar por si reiniciamos el juego
@@ -101,11 +102,11 @@ void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
 		case 'E': {
-			Enemy* enemy = new Enemy(x, y, game);
+			AnnoyingEnemy* annoyingEnemy = new AnnoyingEnemy(x, y, game);
 			// modificación para empezar a contar desde el suelo.
-			enemy->y = enemy->y - enemy->height / 2;
-			enemies.push_back(enemy);
-			space->addDynamicActor(enemy);
+			annoyingEnemy->y = annoyingEnemy->y - annoyingEnemy->height / 2;
+			enemies.push_back(annoyingEnemy);
+			//space->addDynamicActor(annoyingEnemy);  //control a mano
 			break;
 		}
 		case 'F': {
@@ -136,6 +137,14 @@ void GameLayer::loadMapObject(char character, float x, float y)
 			space->addStaticActor(tile);
 			break;
 		}
+		case 'C': {
+			Chocography* chocography = new Chocography(x, y, game);  //no tienen imagen
+			// modificación para empezar a contar desde el suelo.
+			chocography->y = chocography->y - chocography->height / 2;
+			chocographies.push_back(chocography);
+			space->addStaticActor(chocography);
+			break;
+		}
 	}
 }
 
@@ -163,14 +172,22 @@ void GameLayer::processControls() {
 		if (game->input == game->inputMouse) {
 			mouseToControls(event);
 		}
-
 	}
+
 	//procesar controles
 	if (controlContinue) {  //retira pausa del juego si lee controlContinue==true
 		pause = false;
 		controlContinue = false;
-	}
 
+		/*inicio del trmporizador : tras haberse eliminado el mensaje "cómo jugar", pero solo tras iniciar partida
+		(no mirar ni reiniciar en pausas durante la partida)*/
+		if (firstStart) {
+			initTime = SDL_GetTicks(); //se inicial el temporizador
+			pauseTime = 0;
+			activeTimer = true;
+			firstStart = false;
+		}
+	}
 
 	// Eje X
 	if (controlMoveX > 0) {
@@ -211,7 +228,7 @@ void GameLayer::update() {
 	player->update();
 
 	for (auto const& enemy : enemies) {
-		//enemy->update();                                        TEMPORALMENTE COMENTADO PARA PROBAR ANIMACIONES PLAYER
+		enemy->update(player);                                        //TEMPORALMENTE COMENTADO PARA PROBAR ANIMACIONES PLAYER
 	}
 
 	for (auto const& friendMoguri : friends) {
@@ -243,8 +260,8 @@ void GameLayer::update() {
 				pauseInit = SDL_GetTicks();
 				pauseTime += waitingTime;
 				//mostrar mensaje del moguri:
-				textPauseMessage->content = "¡Amigo Moguri te ayuda! Tiempo detenido.";
-				showPauseMessage = true;
+				textMoguriPauseMessage->content = "¡Amigo Moguri te ayuda! Tiempo detenido.";
+				showMoguriPauseMessage = true;
 			}
 		}
 	}
@@ -261,7 +278,7 @@ void GameLayer::updateTimer() {
 		if (SDL_GetTicks() - pauseInit >= waitingTime) {  //mirar si ha terminado la pausa
 			temporalPause = false;
 			activeTimer = true;
-			showPauseMessage = false;
+			showMoguriPauseMessage = false;
 		}
 	}
 	//cuando no hay pausa activa:
@@ -284,8 +301,8 @@ void GameLayer::updateTimer() {
 		int min = sec / 60;
 		sec = sec % 60;
 
-		stringstream ss;  //formato para mostrar el temporizador== MM:ss (algo así como StringBuilder)
-		ss << "Tiempo: ";
+		stringstream ss;  //formato para mostrar el temporizador== MM:ss (algo como StringBuilder)
+		ss << "";
 		if (min < 10) ss << "0";
 		ss << min << ":";
 		if (sec < 10) ss << "0";
@@ -390,14 +407,14 @@ void GameLayer::draw() {
 
 	//mostrar temporizador:
 	textTimer->draw();
+	//mostrar icono:
+	backgroundTimer->draw();
 
 	//mostrar o no mensaje del moguri al empezar la pausa (tras colisión):
-	if (showPauseMessage) {
-		textPauseMessage->draw();
+	if (showMoguriPauseMessage) {
+		textMoguriPauseMessage->draw();
 	}
 
-	backgroundPoints->draw();
-	textPoints->draw();
 	//ampli: pintar marcador recolectables:
 	backgroundCollectibles->draw();
 	textCollected->draw();

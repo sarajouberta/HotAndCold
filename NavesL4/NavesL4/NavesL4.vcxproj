@@ -162,10 +162,11 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnnoyingEnemy.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Chocography.cpp" />
-    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyOld.cpp" />
     <ClCompile Include="FriendMoguri.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameLayer.cpp" />
@@ -182,10 +183,11 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnnoyingEnemy.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="Chocography.h" />
-    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyOld.h" />
     <ClInclude Include="FriendMoguri.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameLayer.h" />
