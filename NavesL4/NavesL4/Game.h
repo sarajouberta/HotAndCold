@@ -66,8 +66,8 @@ public:
 	//para acabar la partida cuando termine el temporizador:
 	//string state = "playing";   //cambiado tras añadir mejor una nueva layer de GameOver
 	//refe a la layer de game over
-	GameOverLayer* gameOverLayer;
-	//¡Cuidado! ya había variable de este tipo, solo q declarada como Layer* (pero instanciada como GameLayer())
+	Layer* gameOverLayer;
+	//¡Cuidado! ya había variable de tipo GameLayer*, solo q declarada como Layer* (pero instanciada como GameLayer())
 	//GameLayer* gameLayer; //también, para poder reiniciar el juego desde el final de partida
 
 };

@@ -17,6 +17,7 @@ Game::Game() {
 
 	menuLayer = new MenuLayer(this);
 	gameLayer = new GameLayer(this);
+	gameOverLayer = new GameOverLayer(this);
 	layer = menuLayer; // Pantalla INICIAL MENULAYER
 
 	//se añade layer game over:

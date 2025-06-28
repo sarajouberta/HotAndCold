@@ -63,7 +63,7 @@ public:
 	list<Tile*> tiles;
 
 	Audio* audioBackground;
-	int newEnemyTime = 0;                                //revisar
+	int newEnemyTime = 0;                                //revisar: NO HACE FALTAAAAA
 	Player* player;
 	Background* background;
 	
@@ -111,5 +111,12 @@ public:
 
 	//para mostrar mensaje/pantalla de que se acabó en tiempo y, por tanto, la partida:
 	bool showGameOver;
+
+	//para controlar posiciones y pistas sobre las chocografías:
+	void updateChocographies();
+	Text* textChocoHint;
+	Uint32 hintStartTime = 0;  //para limitar que la pista se muestre solo un segundo
+	bool showHotColdHint = false;
+	//Text* textChocoDistance;  //de momento nada, funciona fatal
 
 };

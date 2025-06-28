@@ -2,7 +2,7 @@
 
 //inicializa la posición y el estado "no encontrada"
 Chocography::Chocography(float x, float y, Game* game)
-    : Actor("", x, y, choco_width, choco_height, game), encontrada(false) {
+    : Actor("res/empty.png", x, y, 20, 20, game), encontrada(false) {
     //no se dibuja: ""
 }
 

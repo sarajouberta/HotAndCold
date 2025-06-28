@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(float x, float y, Game* game)         //PONER DATOS CORRECTOS A TODOE STOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-	: Actor("res/.png", x, y, 35, 35, game) {
+	: Actor("res/moguri.png", x, y, 35, 35, game) {
 
 	speed = runningSpeed; // velocidad por defecto
 	

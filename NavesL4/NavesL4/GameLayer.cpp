@@ -18,6 +18,14 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 	textMoguriPauseMessage = new Text("hola", WIDTH * 0.5, HEIGHT * 0.5, game);  //mensaje colisión con moguri
 	textMoguriPauseMessage->content = ""; // vacía por defecto
 
+	//textChocoDistance = new Text("", WIDTH * 0.20, HEIGHT * 0.08, game);
+	//textChocoDistance->content = "Distancia: ???";   funciona mal
+
+	//posición aleatoria, pero evita nullppinter si x alguna razón se llama antes de que esté listo player: 
+	//textChocoHint = new Text("hola", WIDTH * 0.5, HEIGHT * 0.5, game);
+	//textChocoHint->content = "";  //hasta que no se muestren en updateChoc() coordenadas aleatorias+vacía
+
+
 	init();
 }
 
@@ -127,7 +135,6 @@ void GameLayer::loadMapObject(char character, float x, float y)
 			player->y = player->y - player->height / 2;
 			space->addDynamicActor(player);
 			break;
-
 		}
 		case '#': {
 			Tile* tile = new Tile("res/arbusto.png", x, y, game);
@@ -227,8 +234,11 @@ void GameLayer::update() {
 	background->update();
 	player->update();
 
+	//control de las posiciones de las chocografías:
+	//updateChocographies();
+
 	for (auto const& enemy : enemies) {
-		enemy->update(player);                                        //TEMPORALMENTE COMENTADO PARA PROBAR ANIMACIONES PLAYER
+		enemy->update(player);                                        
 	}
 
 	for (auto const& friendMoguri : friends) {
@@ -294,7 +304,7 @@ void GameLayer::updateTimer() {
 			pause = true; //se pausa el juego de fondo, además de mostrar el mensaje
 			//game->state = "timeout";   //cambiado por el cambio de layer
 			
-			//game->layer = game->gameOverLayer;
+			game->layer = game->gameOverLayer;
 		}
 
 		int sec = timeLeft / 1000;
@@ -311,6 +321,56 @@ void GameLayer::updateTimer() {
 		textTimer->content = ss.str();
 	}
 }
+
+void GameLayer::updateChocographies() {
+	float minDistance = 99999.0f;  //valor alto para que cubra mucha superficie de búsqueda
+	Chocography* closestChoco = nullptr;
+
+	for (auto const& choco : chocographies) {
+		if (choco->isEncontrada()) continue;
+		//calcular posición respecto del jugador:
+		float dx = player->x - choco->x;
+		float dy = player->y - choco->y;
+		float dist = sqrt(dx * dx + dy * dy);
+		//elegir la que tenga menor distancia:
+		if (dist < minDistance) {
+			minDistance = dist;
+			closestChoco = choco;
+		}
+	}
+
+	//para actualizar mensajes de pistas:
+	if (closestChoco != nullptr) {
+		string hint;
+		if (minDistance < 30) {
+			hint = "KHUÉ???";
+		}
+		else if (minDistance < 80) {
+			hint = "khué??";
+		}
+		else if (minDistance < 150) {
+			hint = "khué";
+		}
+		else {
+			hint = "";
+		}
+		//actualizar y mostrar cuando haya pista:
+		if (!hint.empty()) {
+			textChocoHint->content = hint;
+			textChocoHint->x = player->x - scrollX;
+			//ubicar mensaje de pista encima del jugador:
+			textChocoHint->y = player->y - player->height * 0.7 - scrollY;
+
+			showHotColdHint = true;
+			hintStartTime = SDL_GetTicks();  //para controlar el tiempo que dura la pista
+		}
+	}
+	else {
+		textChocoHint->content = "";
+	}
+}
+
+
 
 
 
@@ -374,6 +434,11 @@ void GameLayer::draw() {
 	for (auto const& tile : tiles) {
 		tile->draw(scrollX, scrollY);
 	}
+	//aunque sean transparentes: situal chocos para poder localizarlas
+	for (auto const& choco : chocographies) {
+		//choco->draw(scrollX, scrollY);
+	}
+
 	//for (auto const& desTile : destructibleTiles) {
 		//desTile->draw(scrollX, scrollY);
 	//}
@@ -409,6 +474,14 @@ void GameLayer::draw() {
 	textTimer->draw();
 	//mostrar icono:
 	backgroundTimer->draw();
+	//mensaje de pista sobre la chocografía más cercana:
+	if (textChocoHint != nullptr) {
+		//textChocoHint->draw();  //tiene que moverse con el jugador
+	}
+
+	//textChocoHint->draw(); 
+	//actualizar contador distancia a choco + cercana:
+	//textChocoDistance->draw();
 
 	//mostrar o no mensaje del moguri al empezar la pausa (tras colisión):
 	if (showMoguriPauseMessage) {

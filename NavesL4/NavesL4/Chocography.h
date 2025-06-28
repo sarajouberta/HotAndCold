@@ -5,8 +5,8 @@ class Chocography : public Actor
 public:
     bool encontrada;
 
-    float choco_width;
-    float choco_height;
+    float choco_width = 20.0;   //.png de 20x20 vacío
+    float choco_height = 20.0;
 
     Chocography(float x, float y, Game* game);
 
