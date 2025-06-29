@@ -2,6 +2,7 @@
 #include "GameLayer.h"
 #include "MenuLayer.h"
 #include "GameOverLayer.h"
+#include "VictoryLayer.h"
 
 Game::Game() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -18,6 +19,8 @@ Game::Game() {
 	menuLayer = new MenuLayer(this);
 	gameLayer = new GameLayer(this);
 	gameOverLayer = new GameOverLayer(this);
+	victoryLayer = new VictoryLayer(this);
+
 	layer = menuLayer; // Pantalla INICIAL MENULAYER
 
 	//se añade layer game over:

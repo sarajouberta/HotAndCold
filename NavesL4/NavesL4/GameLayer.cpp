@@ -31,6 +31,10 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 	textChocoHint->content = "";  //hasta que no se muestren en updateChoc() coordenadas aleatorias+vacía
 	showHotColdHint = false;
 
+	textChocoFoundMessage = new Text("hola", WIDTH * 0.5, HEIGHT * 0.4, game);
+	textChocoFoundMessage->content = "";
+	textChocoFoundMessage->color = { 255, 215, 0, 255 }; //dorado: mensaje de conseguir choco
+
 	init();
 }
 
@@ -60,7 +64,6 @@ void GameLayer::init() {
 	//mostrar chocografías:      
 	collected = 0;
 	textCollected = new Text("hola", WIDTH * 0.67, HEIGHT * 0.04, game);
-	textCollected->content = to_string(collected) + "/" + to_string(totalChocos);
 	
 	background = new Background("res/fondo_hierba.png", WIDTH * 0.5, HEIGHT * 0.5, 0, game);  //CAMBIO A VELOCIDAD 0 PARA PROBAR ESTÁTICO
 	//icono temporizador:
@@ -78,6 +81,8 @@ void GameLayer::init() {
 	//cargar currentLevel, ya no hardcodeado
 	loadMap("res/" + to_string(game->currentLevel) + ".txt");   //comentado para probar con un mapa de prueba !!!!!!!
 	//loadMap("res/prueba.txt");
+	textCollected->content = to_string(collected) + "/" + to_string(totalChocos);  //se rellena tras leer mapa
+
 }
 
 void GameLayer::loadMap(string name) {
@@ -273,17 +278,33 @@ void GameLayer::update() {
 
 	//COLISIÓN CON CHOCOGRAPHY: tiene que incrementarse el contador de chocos + marcarse como encontrada
 	if (controlPeck) {  //se mira primero si player está picando
-		updateChocographies();
+		
 		//mirar si pica sobre choco:
 		for (auto const& choco : chocographies) {
 			if (!choco->isEncontrada() && player->isOverlap(choco)) {
 				choco->picar();  //encontrada
 				collected++;     //incremento contador
 				textCollected->content = to_string(collected) + "/" + to_string(totalChocos); //actualizar texto encontradas
+				
+				//mensaje solo si no es la última chocografía
+				if (collected < totalChocos) {
+					textChocoFoundMessage->content = "¡Conseguiste chocografía!";
+					textChocoFoundMessage->x = player->x - scrollX;
+					textChocoFoundMessage->y = player->y - player->height * 0.7 - scrollY;
+					showChocoFoundMessage = true;
+					chocoFoundStartTime = SDL_GetTicks();
+				}
+				
 				break; //solo una choco por picotazo
 			}
 		}
+		updateChocographies();
 		controlPeck = false; // Solo una vez por pulsación
+	}
+	//controlar duración mensaje de recoger choco:
+	if (showChocoFoundMessage && SDL_GetTicks() - chocoFoundStartTime > 1000) {
+		showChocoFoundMessage = false;
+		textChocoFoundMessage->content = "";
 	}
 
 
@@ -368,21 +389,20 @@ void GameLayer::updateChocographies() {
 			closestChoco = choco;
 		}
 	}
-
 	//para actualizar mensajes de pistas:
 	if (closestChoco != nullptr) {
 		string hint;
 		if (minDistance < 50) {
-			hint = "KHUÉ???";
+			hint = "KWÉH???";
 		}
 		else if (minDistance < 100) {
-			hint = "khué??";
+			hint = "kwéh?";
 		}
 		else if (minDistance < 200) {
-			hint = "khué";
+			hint = "kwéh";
 		}
 		else {
-			hint = "";
+			hint = "...";
 		}
 		//actualizar y mostrar cuando haya pista:
 		if (!hint.empty()) {
@@ -410,6 +430,19 @@ void GameLayer::updateChocographies() {
 		showHotColdHint = false;
 		textChocoHint->content = "";
 	}
+	//para controlar si se han encontrado todas las chocografías:
+	if (collected == totalChocos && totalChocos > 0) {
+		pause = true;
+		showVictory = true;
+		
+		if (game->victoryLayer != nullptr) {
+			game->layer = game->victoryLayer;
+		}
+		else {
+			cout << "Error: VictoryLayer no está inicializada." << endl;
+		}
+	}
+
 }
 
 
@@ -494,6 +527,13 @@ void GameLayer::draw() {
 	textTimer->draw();
 	//mostrar icono:
 	backgroundTimer->draw();
+	// Mostrar mensaje de chocografía encontrada
+	if (showChocoFoundMessage && SDL_GetTicks() - chocoFoundStartTime < 1000) {
+		textChocoFoundMessage->draw();
+	}
+	else {
+		showChocoFoundMessage = false;
+	}
 	//mensaje de pista sobre la chocografía más cercana:
 	if (showHotColdHint && textChocoHint != nullptr) {
 		textChocoHint->draw();  //tiene que moverse con el jugador
@@ -504,7 +544,6 @@ void GameLayer::draw() {
 		textChocoHint->content = "";
 	}
 
-	//textChocoHint->draw(); 
 	//actualizar contador distancia a choco + cercana:
 	//textChocoDistance->draw();
 

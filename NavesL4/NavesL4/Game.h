@@ -23,6 +23,7 @@ using namespace std;
 */
 class GameLayer;
 class GameOverLayer;
+class Victorylayer;
 class Layer;
 
 class Game
@@ -69,5 +70,5 @@ public:
 	Layer* gameOverLayer;
 	//¡Cuidado! ya había variable de tipo GameLayer*, solo q declarada como Layer* (pero instanciada como GameLayer())
 	//GameLayer* gameLayer; //también, para poder reiniciar el juego desde el final de partida
-
+	Layer* victoryLayer;
 };

@@ -104,6 +104,8 @@ public:
 	Text* textMoguriPauseMessage; //para que el mguri anuncie que le ha ayudado y comience la pausa
 	bool showMoguriPauseMessage = false;
 
+	//falta volver a añdir mensaje al colisionar con personaje molesto:
+
 	//para temporizador:
 	Text* textTimer;
 	void updateTimer();
@@ -111,6 +113,9 @@ public:
 
 	//para mostrar mensaje/pantalla de que se acabó en tiempo y, por tanto, la partida:
 	bool showGameOver;
+
+	//para mostrar mensaje/pantalla de que se se ganó la partida:
+	bool showVictory;
 
 	//para controlar posiciones y pistas sobre las chocografías:
 	void updateChocographies();
@@ -125,9 +130,13 @@ public:
 	bool isSlowed = false;
 	int slowStartTime = 0;
 	int slowDuration = 3000; //de momento, 3 segundos
-
 	//variable para guardar la velocidad original, antes de ralentizar al chocobo
 	float originalSpeed = 6.0f; //como runningSpeed: float valor 6 (runningSpeed)
-
 	Text* textSlowMessage;
+
+	//añado mensaje de que se ha encontrado una chocografía:
+	Text* textChocoFoundMessage;
+	Uint32 chocoFoundStartTime;
+	bool showChocoFoundMessage = false;
+
 };

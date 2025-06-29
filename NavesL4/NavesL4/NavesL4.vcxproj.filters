@@ -84,6 +84,9 @@
     <ClCompile Include="AnnoyingEnemy.cpp">
       <Filter>Archivos de origen\actores</Filter>
     </ClCompile>
+    <ClCompile Include="VictoryLayer.cpp">
+      <Filter>Archivos de origen\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -139,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="AnnoyingEnemy.h">
       <Filter>Archivos de encabezado\actores</Filter>
+    </ClInclude>
+    <ClInclude Include="VictoryLayer.h">
+      <Filter>Archivos de encabezado\layers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
