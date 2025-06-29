@@ -55,7 +55,7 @@ void GameLayer::init() {
 	//mostrar chocografías:      
 	collected = 0;
 	textCollected = new Text("hola", WIDTH * 0.67, HEIGHT * 0.04, game);
-	textCollected->content = to_string(collected);
+	textCollected->content = to_string(collected) + "/" + to_string(totalChocos);
 	
 	background = new Background("res/fondo_hierba.png", WIDTH * 0.5, HEIGHT * 0.5, 0, game);  //CAMBIO A VELOCIDAD 0 PARA PROBAR ESTÁTICO
 	//icono temporizador:
@@ -150,6 +150,7 @@ void GameLayer::loadMapObject(char character, float x, float y)
 			chocography->y = chocography->y - chocography->height / 2;
 			chocographies.push_back(chocography);
 			//space->addStaticActor(chocography);  //chocos son actores lógicos, no físicos !!
+			totalChocos++;
 			break;
 		}
 	}
@@ -264,7 +265,7 @@ void GameLayer::update() {
 			if (!choco->isEncontrada() && player->isOverlap(choco)) {
 				choco->picar();  //encontrada
 				collected++;     //incremento contador
-				textCollected->content = to_string(collected); //actualizar texto encontradas
+				textCollected->content = to_string(collected) + "/" + to_string(totalChocos); //actualizar texto encontradas
 				break; //solo una choco por picotazo
 			}
 		}

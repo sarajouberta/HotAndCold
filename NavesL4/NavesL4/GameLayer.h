@@ -119,4 +119,6 @@ public:
 	bool showHotColdHint = false;
 	//Text* textChocoDistance;  //de momento nada, funciona fatal
 
+	int totalChocos; //para mostrar cuántas hay que encontrar en el nivel
+
 };
