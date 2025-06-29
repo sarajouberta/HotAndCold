@@ -153,7 +153,7 @@ void Player::peck() {
 			aPeckingRight->currentFrame = 0;
 			aPeckingRight->loop = false; //no debería repetirse
 		}
-		audioPeck->play();                            //COMPROBAR SI SE EJECUTA 1 VEZ O MÁS !!!
+		//audioPeck->play();                            //COMPROBAR SI SE EJECUTA 1 VEZ O MÁS !!!
 	}
 }
 
