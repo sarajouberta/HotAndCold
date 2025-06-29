@@ -149,7 +149,7 @@ void GameLayer::loadMapObject(char character, float x, float y)
 			// modificación para empezar a contar desde el suelo.
 			chocography->y = chocography->y - chocography->height / 2;
 			chocographies.push_back(chocography);
-			space->addStaticActor(chocography);
+			//space->addStaticActor(chocography);  //chocos son actores lógicos, no físicos !!
 			break;
 		}
 	}
@@ -258,6 +258,19 @@ void GameLayer::update() {
 			}*/
 		}
 	}
+	//COLISIÓN CON CHOCOGRAPHY: tiene que incrementarse el contador de chocos + marcarse como encontrada
+	if (controlPeck) {  //se mira primero si player está picando, luego si está sobre choco
+		for (auto const& choco : chocographies) {
+			if (!choco->isEncontrada() && player->isOverlap(choco)) {
+				choco->picar();  //encontrada
+				collected++;     //incremento contador
+				textCollected->content = to_string(collected); //actualizar texto encontradas
+				break; //solo una choco por picotazo
+			}
+		}
+		controlPeck = false; // Solo una vez por pulsación
+	}
+
 
 	// Colisiones: COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
 	////COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
@@ -468,6 +481,10 @@ void GameLayer::draw() {
 
 	for (auto const& friendMoguri : friends) {
 		friendMoguri->draw(scrollX, scrollY);
+	}
+
+	for (auto const& chocography : chocographies) {
+		chocography->draw(scrollX, scrollY);
 	}
 
 	//mostrar temporizador:

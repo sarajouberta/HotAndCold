@@ -13,7 +13,7 @@ public:
     void picar();
     bool isEncontrada();
 
-    void draw(float scrollX, float scrollY
-    ); //sobrecargado para que NO se dibuje (vacío)
+    //void draw(float scrollX, float scrollY
+    //); //sobrecargado para que NO se dibuje (vacío)
 };
 

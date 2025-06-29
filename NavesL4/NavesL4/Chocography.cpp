@@ -2,7 +2,7 @@
 
 //inicializa la posición y el estado "no encontrada"
 Chocography::Chocography(float x, float y, Game* game)
-    : Actor("res/empty.png", x, y, 20, 20, game), encontrada(false) {
+    : Actor("res/chocography_icon.png", x, y, 20, 20, game), encontrada(false) {
     //no se dibuja: ""
 }
 
@@ -15,7 +15,7 @@ bool Chocography::isEncontrada() {
 }
 
 //no se dibuja porque es invisible: sobrecarga vacía
-void Chocography::draw(float scrollX, float scrollY) {
+//void Chocography::draw(float scrollX, float scrollY) {
     //es invisible
-}
+//}
 
