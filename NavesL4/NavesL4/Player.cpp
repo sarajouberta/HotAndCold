@@ -12,22 +12,22 @@ Player::Player(float x, float y, Game* game)         //PONER DATOS CORRECTOS A T
 	//audioPickingChocoGraphy = new Audio("res/.wav", false);
 
 	aIdleRight = new Animation("res/choco_camina_dcha.png", width, height,
-		89, 30, 4, 3, true, game);
+		89, 30, 10, 3, true, game);
 	aIdleLeft = new Animation("res/choco_camina_izda.png", width, height,
-		89, 30, 4, 3, true, game);
+		89, 30, 10, 3, true, game);
 	aIdleUp = new Animation("res/choco_camina_arriba.png", width, height,
-		43, 30, 4, 2, true, game);
+		43, 30, 10, 2, true, game);
 	aIdleDown = new Animation("res/choco_camina_abajo.png", width, height,
-		145, 30, 4, 5, true, game);
+		145, 30, 10, 5, true, game);
 	aRunningRight = new Animation("res/choco_corre_dcha.png", width, height,
-		147, 40, 4, 5, true, game);
+		147, 40, 10, 5, true, game);
 	aRunningLeft = new Animation("res/choco_corre_izda.png", width, height,
-		151, 30, 4, 5, true, game);
+		151, 30, 10, 5, true, game);
 	//correr arriba/abajo igual que caminar (cambia la velocidad, de momento)    REVISAAAAAAR
 	aRunningUp = new Animation("res/choco_camina_arriba.png", width, height,
-		43, 30, 4, 2, true, game);
+		43, 30, 10, 2, true, game);
 	aRunningDown = new Animation("res/choco_camina_abajo.png", width, height,
-		43, 30, 4, 2, true, game);
+		43, 30, 10, 2, true, game);
 
 	//posiciones estáticas: (bucle false y 1 frame)
 	aStandingRight = new Animation("res/choco_quieto_dcha.png", width, height,
@@ -71,7 +71,7 @@ currentFrame y updateTime a cero == el código original en Player habría funciona
 */
 
 void Player::update() {
-
+	//si está picando:
 	if (state == game->statePecking) {
 		if (orientation == game->orientationLeft || orientation == game->orientationDown) {
 			animation = aPeckingLeft;
@@ -93,14 +93,15 @@ void Player::update() {
 			}
 		}
 	}
+	//si se mueve:
 	else if (state == game->stateMoving) {
 		cout << "movimiento stateMoving: (debería ser 1): " << state << endl;
 		if (vx > 0) orientation = game->orientationRight;
 		else if (vx < 0) orientation = game->orientationLeft;
 		else if (vy < 0) orientation = game->orientationUp;
 		else if (vy > 0) orientation = game->orientationDown;
-		
-		if (abs(vx) >= runningSpeed || abs(vy) >= runningSpeed) {    //si corre (por defecto)                       //MODIFICAR VELOCIDAD ENTRE CAMINAR Y CORRER !!!!
+		//si corre (por defecto):
+		if (abs(vx) >= runningSpeed || abs(vy) >= runningSpeed) {    
 			switch (orientation) {
 			case 1: animation = aRunningRight; break;
 			case 2: animation = aRunningLeft; break;
@@ -108,7 +109,8 @@ void Player::update() {
 			case 4: animation = aRunningDown; break;
 			}
 		}
-		else if (vx != 0 || vy != 0) { //si camina (caminará cuando se ralentice x chocar con npc malo !!!!!!)
+		//si camina (caminará cuando se ralentice x overlap con enemigo molesto)
+		else if (vx != 0 || vy != 0) {
 			switch (orientation) {
 			case 1: animation = aIdleRight; break;
 			case 2: animation = aIdleLeft; break;
@@ -129,11 +131,11 @@ void Player::update() {
 }
 
 void Player::moveX(float axis) {
-	vx = axis * speed;      //DE MOMENTO CORRE X DEFECTOOOOOOOO
+	vx = axis * speed;            //CORRE X DEFECTOOOOOOOO
 }
 
 void Player::moveY(float axis) {
-	vy = axis * runningSpeed;
+	vy = axis * speed;  //ya no usa runningSpeed al añadir animación de caminar(colisión con molesto)
 }
 
 void Player::peck() {
@@ -151,7 +153,7 @@ void Player::peck() {
 			aPeckingRight->currentFrame = 0;
 			aPeckingRight->loop = false; //no debería repetirse
 		}
-		//audioPeck->play();                            //COMPROBAR SI SE EJECUTA 1 VEZ O MÁS !!!
+		audioPeck->play();                            //COMPROBAR SI SE EJECUTA 1 VEZ O MÁS !!!
 	}
 }
 

@@ -16,7 +16,11 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 	//message: apunta al “mensaje actual”, pero puede cambiarse en cualquier momento, instanciando otro actor
 
 	textMoguriPauseMessage = new Text("hola", WIDTH * 0.5, HEIGHT * 0.5, game);  //mensaje colisión con moguri
-	textMoguriPauseMessage->content = ""; // vacía por defecto
+	textMoguriPauseMessage->content = ""; // vacía por defecto (y color blanco x defecto)
+
+	textSlowMessage = new Text("hola", WIDTH * 0.5, HEIGHT * 0.6, game);  //mensaje colisión enemigo molesto
+	textSlowMessage->content = "";
+	textSlowMessage->color = { 255, 0, 0, 255 }; //mensaje de color rojo
 
 	//textChocoDistance = new Text("", WIDTH * 0.20, HEIGHT * 0.08, game);
 	//textChocoDistance->content = "Distancia: ???";   funciona mal
@@ -250,16 +254,23 @@ void GameLayer::update() {
 	// Colisiones: ENEMIGO MOLESTO
 	for (auto const& enemy : enemies) {
 		if (player->isOverlap(enemy)) {
-
 			//CUANDO CHOCOBO CHOQUE CON ENEMIGO MOLESTO: TENDRÁ QUE BAJAR LA VELOCIDAD DEL CHOCOBO
-			//(DECIDIR SI PUEDE HABER + DE 1)
-			/*player->loseLife();
-			if (player->lifes <= 0) {
-				init();
-				return;
-			}*/
+			if (!isSlowed) {
+				isSlowed = true;
+				slowStartTime = SDL_GetTicks();
+				originalSpeed = player->speed; //se guarda la original para poder restablecerla
+				player->speed *= 0.5; // reducir velocidad a la mitad
+				textSlowMessage->content = "¡Oh, no! ¡Enemigo molesto te ha ralentizado!";
+			}
 		}
 	}
+	//para restablecer la velocidad el chocobo, si estaba ralentizada:
+	if (isSlowed && SDL_GetTicks() - slowStartTime > slowDuration) {
+		isSlowed = false;
+		player->speed = originalSpeed;
+		textSlowMessage->content = "";
+	}
+
 	//COLISIÓN CON CHOCOGRAPHY: tiene que incrementarse el contador de chocos + marcarse como encontrada
 	if (controlPeck) {  //se mira primero si player está picando
 		updateChocographies();
@@ -385,6 +396,7 @@ void GameLayer::updateChocographies() {
 		}
 
 		//color según lejanía/ceercanía de la pista:
+
 		if (hint.find('?') != string::npos) {
 			//pistas de acercarse: color granate
 			textChocoHint->color = { 128, 0, 32, 255 }; //granate oscuro
@@ -499,6 +511,11 @@ void GameLayer::draw() {
 	//mostrar o no mensaje del moguri al empezar la pausa (tras colisión):
 	if (showMoguriPauseMessage) {
 		textMoguriPauseMessage->draw();
+	}
+
+	//mostrar o no mensaje del enemigo molesto al empezar la ralentización de velocidad (tras colisión):
+	if (!textSlowMessage->content.empty()) {
+		textSlowMessage->draw();
 	}
 
 	//ampli: pintar marcador recolectables:

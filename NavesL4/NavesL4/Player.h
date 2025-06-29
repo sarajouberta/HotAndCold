@@ -47,8 +47,8 @@ public:
 	Animation* aStandingDown;
 
 	Animation* animation; //referencia a la animación mostrada
-	//Audio* audioPeck;
-	//Audio* audioPickingChocoGraphy;
+	Audio* audioPeck;
+	Audio* audioPickingChocoGraphy;
 	
 };
 

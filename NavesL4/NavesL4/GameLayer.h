@@ -121,4 +121,13 @@ public:
 
 	int totalChocos; //para mostrar cuántas hay que encontrar en el nivel
 
+	//para controlar colisión con enemigo moelsto:
+	bool isSlowed = false;
+	int slowStartTime = 0;
+	int slowDuration = 3000; //de momento, 3 segundos
+
+	//variable para guardar la velocidad original, antes de ralentizar al chocobo
+	float originalSpeed = 6.0f; //como runningSpeed: float valor 6 (runningSpeed)
+
+	Text* textSlowMessage;
 };
