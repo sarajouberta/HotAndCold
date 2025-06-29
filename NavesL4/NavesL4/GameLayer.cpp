@@ -22,11 +22,11 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 	textSlowMessage->content = "";
 	textSlowMessage->color = { 255, 0, 0, 255 }; //mensaje de color rojo
 
-	//textChocoDistance = new Text("", WIDTH * 0.20, HEIGHT * 0.08, game);
-	//textChocoDistance->content = "Distancia: ???";   funciona mal
+	textChocoDistance = new Text("", WIDTH * 0.15, HEIGHT * 0.15, game);
+	textChocoDistance->content = "Distancia:";   //funciona mal
 
 	//posición aleatoria, pero evita nullppinter si x alguna razón se llama antes de que esté listo player: 
-	textChocoHint = new Text("khué", WIDTH * 0.5, HEIGHT * 0.5, game);
+	textChocoHint = new Text("kwéh", WIDTH * 0.5, HEIGHT * 0.5, game);
 	//textChocoHint->color = { 0, 191, 255, 255 }; 
 	textChocoHint->content = "";  //hasta que no se muestren en updateChoc() coordenadas aleatorias+vacía
 	showHotColdHint = false;
@@ -118,11 +118,11 @@ void GameLayer::loadMap(string name) {
 
 void GameLayer::loadMapObject(char character, float x, float y)
 {
-	//Siempre creamos una tile de fondo
+	//se crea siempre una tile de fondo
 	Tile* tile = new Tile("res/hierba_fondo.png", x, y, game);
 	tile->y = tile->y - tile->height / 2;
 	backgroundTiles.push_back(tile);
-	//space->addStaticActor(tile);
+	//space->addStaticActor(tile);  //fuera del espacio para no crear colisión
 
 	switch (character) {
 		case 'E': {
@@ -284,7 +284,6 @@ void GameLayer::update() {
 
 	//COLISIÓN CON CHOCOGRAPHY: tiene que incrementarse el contador de chocos + marcarse como encontrada
 	if (controlPeck) {  //se mira primero si player está picando
-		
 		//mirar si pica sobre choco:
 		for (auto const& choco : chocographies) {
 			if (!choco->isEncontrada() && player->isOverlap(choco)) {
@@ -428,6 +427,8 @@ void GameLayer::updateChocographies() {
 			hintStartTime = SDL_GetTicks();  //para controlar el tiempo que dura la pista
 		}
 
+		//usar también valor de chocoDistance para mostrar en el marcador superior el valor:
+		textChocoDistance->content = "Distancia: " + to_string((int)minDistance);
 		//color según lejanía/ceercanía de la pista:
 
 		if (hint.find('?') != string::npos) {
@@ -572,7 +573,7 @@ void GameLayer::draw() {
 	}
 
 	//actualizar contador distancia a choco + cercana:
-	//textChocoDistance->draw();
+	textChocoDistance->draw();
 
 	//mostrar o no mensaje del moguri al empezar la pausa (tras colisión):
 	if (showMoguriPauseMessage) {
@@ -666,6 +667,7 @@ void GameLayer::keysToControls(SDL_Event event) {
 	}
 }
 
+
 void GameLayer::mouseToControls(SDL_Event event) {
 	// Modificación de coordenadas por posible escalado
 	float motionX = event.motion.x / game->scaleLower;
@@ -686,17 +688,21 @@ void GameLayer::mouseToControls(SDL_Event event) {
 		//para el pad: imitar joystick real (sin clicks)
 		if (pad->containsPoint(motionX, motionY)) {
 			controlMoveX = pad->getOrientationX(motionX);
+			// Nueva línea para eje Y
+			controlMoveY = pad->getOrientationY(motionY);
+
 			// Rango de seguridad: -20 a 20 es igual que 0:  x si jugador quiere ponerse en 0, pero no lo consigue
 			if (controlMoveX > -20 && controlMoveX < 20) {
 				controlMoveX = 0;
 			}
-		/*
-		* Código x si quiere implementarse que haya que hacer click
-		* (guion plat3)
-		*/
+			// Zona muerta en Y:
+			if (controlMoveY > -20 && controlMoveY < 20) {
+				controlMoveY = 0;
+			}
 		}
 		else {
 			controlMoveX = 0;
+			controlMoveY = 0;
 		}
 		//if: x si se sale el puntero del botón: tiene que parar
 		if (buttonShoot->containsPoint(motionX, motionY) == false) {

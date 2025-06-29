@@ -123,7 +123,8 @@ public:
 	Text* textChocoHint;
 	Uint32 hintStartTime = 0;  //para limitar que la pista se muestre solo un segundo
 	bool showHotColdHint = false;
-	//Text* textChocoDistance;  //de momento nada, funciona fatal
+
+	Text* textChocoDistance;  //de momento nada, funciona fatal
 
 	int totalChocos; //para mostrar cuántas hay que encontrar en el nivel
 
