@@ -22,9 +22,10 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 	//textChocoDistance->content = "Distancia: ???";   funciona mal
 
 	//posición aleatoria, pero evita nullppinter si x alguna razón se llama antes de que esté listo player: 
-	//textChocoHint = new Text("hola", WIDTH * 0.5, HEIGHT * 0.5, game);
-	//textChocoHint->content = "";  //hasta que no se muestren en updateChoc() coordenadas aleatorias+vacía
-
+	textChocoHint = new Text("khué", WIDTH * 0.5, HEIGHT * 0.5, game);
+	//textChocoHint->color = { 0, 191, 255, 255 }; 
+	textChocoHint->content = "";  //hasta que no se muestren en updateChoc() coordenadas aleatorias+vacía
+	showHotColdHint = false;
 
 	init();
 }
@@ -236,7 +237,7 @@ void GameLayer::update() {
 	player->update();
 
 	//control de las posiciones de las chocografías:
-	//updateChocographies();
+	//updateChocographies();   //la muevo a bucle donde se mira si el jugador está picando
 
 	for (auto const& enemy : enemies) {
 		enemy->update(player);                                        
@@ -260,7 +261,9 @@ void GameLayer::update() {
 		}
 	}
 	//COLISIÓN CON CHOCOGRAPHY: tiene que incrementarse el contador de chocos + marcarse como encontrada
-	if (controlPeck) {  //se mira primero si player está picando, luego si está sobre choco
+	if (controlPeck) {  //se mira primero si player está picando
+		updateChocographies();
+		//mirar si pica sobre choco:
 		for (auto const& choco : chocographies) {
 			if (!choco->isEncontrada() && player->isOverlap(choco)) {
 				choco->picar();  //encontrada
@@ -337,6 +340,8 @@ void GameLayer::updateTimer() {
 }
 
 void GameLayer::updateChocographies() {
+	if (!player) return; //seguridad básica: evitar chash silencioso
+
 	float minDistance = 99999.0f;  //valor alto para que cubra mucha superficie de búsqueda
 	Chocography* closestChoco = nullptr;
 
@@ -356,13 +361,13 @@ void GameLayer::updateChocographies() {
 	//para actualizar mensajes de pistas:
 	if (closestChoco != nullptr) {
 		string hint;
-		if (minDistance < 30) {
+		if (minDistance < 50) {
 			hint = "KHUÉ???";
 		}
-		else if (minDistance < 80) {
+		else if (minDistance < 100) {
 			hint = "khué??";
 		}
-		else if (minDistance < 150) {
+		else if (minDistance < 200) {
 			hint = "khué";
 		}
 		else {
@@ -378,8 +383,19 @@ void GameLayer::updateChocographies() {
 			showHotColdHint = true;
 			hintStartTime = SDL_GetTicks();  //para controlar el tiempo que dura la pista
 		}
+
+		//color según lejanía/ceercanía de la pista:
+		if (hint.find('?') != string::npos) {
+			//pistas de acercarse: color granate
+			textChocoHint->color = { 128, 0, 32, 255 }; //granate oscuro
+		}
+		else {
+			//pista más alejada : azul cobalto
+			textChocoHint->color = { 0, 71, 171, 255 }; //cobalto
+		}
 	}
 	else {
+		showHotColdHint = false;
 		textChocoHint->content = "";
 	}
 }
@@ -448,32 +464,6 @@ void GameLayer::draw() {
 	for (auto const& tile : tiles) {
 		tile->draw(scrollX, scrollY);
 	}
-	//aunque sean transparentes: situal chocos para poder localizarlas
-	for (auto const& choco : chocographies) {
-		//choco->draw(scrollX, scrollY);
-	}
-
-	//for (auto const& desTile : destructibleTiles) {
-		//desTile->draw(scrollX, scrollY);
-	//}
-
-	//for (auto const& projectile : projectiles) {
-		//projectile->draw(scrollX, scrollY);
-	//}
-	//pintar Copa después de tiles, detrás del jugador
-	//cup->draw(scrollX, scrollY);
-
-	//ampli: poner punto de salvar partida
-	//salvar->draw(scrollX, scrollY);
-
-	//ampli: dibujar recolectables
-	//for (auto const& coll : collectibleItems) {
-		//coll->draw(scrollX, scrollY);
-	//}
-	//ampli: dibujar enemigos "saltables"
-	//for (auto const& jumpable : jumpableMonsters) {
-		//jumpable->draw(scrollX, scrollY);
-	//}
 
 	player->draw(scrollX, scrollY);
 	for (auto const& enemy : enemies) {
@@ -493,8 +483,13 @@ void GameLayer::draw() {
 	//mostrar icono:
 	backgroundTimer->draw();
 	//mensaje de pista sobre la chocografía más cercana:
-	if (textChocoHint != nullptr) {
-		//textChocoHint->draw();  //tiene que moverse con el jugador
+	if (showHotColdHint && textChocoHint != nullptr) {
+		textChocoHint->draw();  //tiene que moverse con el jugador
+	}
+	//para controlar que la pista solo dure 1 segundo:  (cuidado con la refe nullptr)
+	if (textChocoHint != nullptr && showHotColdHint && SDL_GetTicks() - hintStartTime > 1000) {
+		showHotColdHint = false;
+		textChocoHint->content = "";
 	}
 
 	//textChocoHint->draw(); 
