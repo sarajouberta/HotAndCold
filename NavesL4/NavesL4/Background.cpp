@@ -15,7 +15,7 @@ Background::Background(string filename, float x, float y, float vx, Game* game)
 }
 
 void Background::update() {
-	if (vx != 0) {
+	/*if (vx != 0) {
 		x = x + vx;
 
 		// se salio por la izquierda
@@ -29,7 +29,7 @@ void Background::update() {
 			x = 0 - width / 2;
 		}
 
-	}
+	}*/
 }
 
 void Background::draw(float scrollX, float scrollY) {

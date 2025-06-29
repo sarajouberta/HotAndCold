@@ -57,7 +57,7 @@ void GameLayer::init() {
 	scrollX = 0;
 	scrollY = 0;  //añadir scrollY para ampliación
 	tiles.clear();																					//REVISAR
-
+	backgroundTiles.clear();
 	//audioBackground = new Audio("res/Ukule_Chocobo_IX.mp3", true);  
 	//audioBackground->play();
 
@@ -65,7 +65,7 @@ void GameLayer::init() {
 	collected = 0;
 	textCollected = new Text("hola", WIDTH * 0.67, HEIGHT * 0.04, game);
 	
-	background = new Background("res/fondo_hierba.png", WIDTH * 0.5, HEIGHT * 0.5, 0, game);  //CAMBIO A VELOCIDAD 0 PARA PROBAR ESTÁTICO
+	//background = new Background("res/fondo_hierba.png", WIDTH * 0.5, HEIGHT * 0.5, 0, game);  //CAMBIO A VELOCIDAD 0 PARA PROBAR ESTÁTICO
 	//icono temporizador:
 	backgroundTimer = new Actor("res/timer_icon.png",
 		WIDTH * 0.1, HEIGHT * 0.05, 45, 48, game);
@@ -118,6 +118,12 @@ void GameLayer::loadMap(string name) {
 
 void GameLayer::loadMapObject(char character, float x, float y)
 {
+	//Siempre creamos una tile de fondo
+	Tile* tile = new Tile("res/hierba_fondo.png", x, y, game);
+	tile->y = tile->y - tile->height / 2;
+	backgroundTiles.push_back(tile);
+	//space->addStaticActor(tile);
+
 	switch (character) {
 		case 'E': {
 			AnnoyingEnemy* annoyingEnemy = new AnnoyingEnemy(x, y, game);
@@ -242,7 +248,7 @@ void GameLayer::update() {
 	limitPlayerPosition();
 
 	space->update();
-	background->update();
+	//background->update();
 	player->update();
 
 	//control de las posiciones de las chocografías:
@@ -522,7 +528,11 @@ void GameLayer::limitPlayerPosition() {
 void GameLayer::draw() {
 	calculateScroll();
 
-	background->draw(scrollX, scrollY);
+	for (auto const& backTile : backgroundTiles) {
+		backTile->draw(scrollX, scrollY);
+	}
+
+	//background->draw(scrollX, scrollY);
 	for (auto const& tile : tiles) {
 		tile->draw(scrollX, scrollY);
 	}

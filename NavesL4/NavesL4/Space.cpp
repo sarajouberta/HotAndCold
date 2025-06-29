@@ -215,3 +215,11 @@ void Space::removeDynamicActor(Actor* actor) {
 void Space::removeStaticActor(Actor* actor) {
 	staticActors.remove(actor);
 }
+
+void Space::addBackgroundActor(Actor* actor) {
+    backgroundActors.push_back(actor);
+}
+
+void Space::removeBackgroundActor(Actor* actor) {
+    backgroundActors.remove(actor);
+}

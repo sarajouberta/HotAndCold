@@ -61,6 +61,7 @@ public:
 	int mapWidth;
 	int mapHeight;
 	list<Tile*> tiles;
+	list<Tile*> backgroundTiles;
 
 	Audio* audioBackground;
 	int newEnemyTime = 0;                                //revisar: NO HACE FALTAAAAA

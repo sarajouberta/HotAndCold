@@ -13,10 +13,13 @@ public:
 	void updateMoveDown(Actor* dynamicAct);
 	void addDynamicActor(Actor* actor);
 	void addStaticActor(Actor* actor);
+	void addBackgroundActor(Actor* actor);
 	void removeDynamicActor(Actor* actor);
 	void removeStaticActor(Actor* actor);
+	void removeBackgroundActor(Actor* actor);
 	float gravity;
 	list<Actor*> dynamicActors;
 	list<Actor*> staticActors;
+	list<Actor*> backgroundActors;
 };
 
