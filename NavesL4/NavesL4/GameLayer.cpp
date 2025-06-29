@@ -311,7 +311,7 @@ void GameLayer::update() {
 	// Colisiones: COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
 	////COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
 	for (auto const& friendMoguri : friends) {
-		if (player->isOverlap(friendMoguri)) {
+		if (!friendMoguri->deleted && player->isOverlap(friendMoguri)) {
 			if (!temporalPause) {
 				temporalPause = true;
 				//parar el movimiento del moguri¿? o poner otra animacion: REVISAR !!
@@ -321,9 +321,16 @@ void GameLayer::update() {
 				//mostrar mensaje del moguri:
 				textMoguriPauseMessage->content = "¡Amigo Moguri te ayuda! Tiempo detenido.";
 				showMoguriPauseMessage = true;
+
+				friendMoguri->use(); //reducir interacciones
 			}
 		}
 	}
+	//eliminar cuando se hayan terminado las interacciones con el/los moguri:
+	friends.remove_if([](FriendMoguri* m) {
+		return m->deleted;
+	});
+
 	//actualizar el cronómetro:
 	updateTimer();
 
@@ -456,34 +463,44 @@ void GameLayer::updateChocographies() {
 * - std::clamp manual(tengo C++14): limitar máx y mín oara que player no se salga de límites
 */
 void GameLayer::calculateScroll() {
-	// Límites de la cámara
+	// Límites del mundo
 	int leftLimit = 0;
 	int topLimit = 0;
-	int rightLimit = 65000;//BACKGROUND_WIDTH;// -WINDOW_WIDTH;  // 600 - 480 = 120
-	int bottomLimit = 65000; // BACKGROUND_HEIGHT;// -WINDOW_HEIGHT;  // 400 - 320 = 80
+	int rightLimit = 1840 - WINDOW_WIDTH;
+	int bottomLimit = 320 - WINDOW_HEIGHT;
 
-	// Limitar el desplazamiento horizontal (scrollX)
-	if (player->x - scrollX < WINDOW_WIDTH * 0.3) {  // Si el jugador está cerca del borde izquierdo
-		scrollX = player->x - WINDOW_WIDTH * 0.3;
+	// Zona muerta (dead zone)
+	float deadZoneXMin = WINDOW_WIDTH * 0.4f;
+	float deadZoneXMax = WINDOW_WIDTH * 0.6f;
+	float deadZoneYMin = WINDOW_HEIGHT * 0.4f;
+	float deadZoneYMax = WINDOW_HEIGHT * 0.6f;
+
+	float playerScreenX = player->x - scrollX;
+	float playerScreenY = player->y - scrollY;
+
+	// Desplazamiento horizontal
+	if (playerScreenX < deadZoneXMin) {
+		scrollX -= (deadZoneXMin - playerScreenX);
 	}
-	if (player->x - scrollX > WINDOW_WIDTH * 0.7) {  // Si el jugador está cerca del borde derecho
-		scrollX = player->x - WINDOW_WIDTH * 0.7;
+	else if (playerScreenX > deadZoneXMax) {
+		scrollX += (playerScreenX - deadZoneXMax);
 	}
 
-	// Limitar el desplazamiento vertical (scrollY)
-	if (player->y - scrollY < WINDOW_HEIGHT * 0.3) {  // Si el jugador está cerca del borde superior
-		scrollY = player->y - WINDOW_HEIGHT * 0.3;
+	// Desplazamiento vertical
+	if (playerScreenY < deadZoneYMin) {
+		scrollY -= (deadZoneYMin - playerScreenY);
 	}
-	if (player->y - scrollY > WINDOW_HEIGHT * 0.7) {  // Si el jugador está cerca del borde inferior
-		scrollY = player->y - WINDOW_HEIGHT * 0.7;
+	else if (playerScreenY > deadZoneYMax) {
+		scrollY += (playerScreenY - deadZoneYMax);
 	}
 
-	// Limitar el desplazamiento para que no se salga del fondo (600x400)
-	//if (scrollX < leftLimit) scrollX = leftLimit;
-	//if (scrollY < topLimit) scrollY = topLimit;
-	//if (scrollX > rightLimit) scrollX = rightLimit;
-	//if (scrollY > bottomLimit) scrollY = bottomLimit;
+	// Limitar scroll a los bordes del mundo
+	if (scrollX < leftLimit) scrollX = leftLimit;
+	if (scrollY < topLimit) scrollY = topLimit;
+	if (scrollX > rightLimit) scrollX = rightLimit;
+	if (scrollY > bottomLimit) scrollY = bottomLimit;
 }
+
 
 void GameLayer::limitPlayerPosition() {
 

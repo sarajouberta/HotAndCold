@@ -13,5 +13,11 @@ public:
 	int state;
 	Animation* aMoving;
 	Animation* animation; // Referencia a la animación mostrada
+
+	//limitar interacciones con player:
+	void use();
+	int usesLeft = 4; //por defecto, 4 de momento
+	bool deleted = false; // para marcarlo para borrar
+
 };
 

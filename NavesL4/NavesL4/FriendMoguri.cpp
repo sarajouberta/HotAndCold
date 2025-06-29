@@ -42,3 +42,11 @@ void FriendMoguri::update() {
 void FriendMoguri::draw(float scrollX, float scrollY) {
 	animation->draw(x - scrollX, y - scrollY);
 }
+
+void FriendMoguri::use() {
+	usesLeft--;
+	if (usesLeft <= 0) {
+		deleted = true;
+	}
+}
+
