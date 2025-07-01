@@ -6,14 +6,14 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 
 	/* Variables pausa/ message: Normalmente esto lo hacemos en el método init() , 
 	pero en este caso nos viene mejor hacerlo en el constructor
-	para evitar que cuando se reinicie el juego aparezca siempre con los mismos valores,
-	nos aportará algo más de control*/
-	//firstStart = true; //distingue pausa inicial para controlar cuándo se inicia el temporizador
-	//pause = true;
+	para evitar que cuando se reinicie el juego aparezca siempre con los mismos valores*/
+
+	//se asigna tiempo según el nivel: 
+	totalTime = getLevelTime(game->currentLevel);
 	//CONTROL DE INIT ENTRE NIVELES:
 	if (game->currentLevel == 0) {
 		pause = true;
-		firstStart = true;
+		firstStart = true;  //distingue pausa inicial para controlar cuándo se inicia el temporizador
 	}
 	else {
 		pause = false;
@@ -64,16 +64,18 @@ void GameLayer::init() {
 
 	pad = new Pad(WIDTH * 0.15, HEIGHT * 0.80, game);
 	//se crean los 2 botones a partir de actor xq son muy simples:
-	buttonJump = new Actor("res/boton_salto.png", WIDTH * 0.9, HEIGHT * 0.55, 100, 100, game);
-	buttonShoot = new Actor("res/boton_disparo.png", WIDTH * 0.75, HEIGHT * 0.83, 100, 100, game);  //MODIFICAR
+	//buttonJump = new Actor("res/boton_salto.png", WIDTH * 0.9, HEIGHT * 0.55, 100, 100, game);
+	buttonPeck = new Actor("res/boton_disparo.png", WIDTH * 0.75, HEIGHT * 0.83, 100, 100, game); 
 
 	space = new Space(0); //Pongo la gravedad en 0, pera retirar la gravedad vertical
 	scrollX = 0;
-	scrollY = 0;  //añadir scrollY para ampliación
+	scrollY = 0; 
 	tiles.clear();																					//REVISAR
 	backgroundTiles.clear();
+
 	//audioBackground = new Audio("res/Ukule_Chocobo_IX.mp3", true);  
 	//audioBackground->play();
+	audioChocoFound = new Audio("res/choco_found.wav", false);
 
 	//mostrar chocografías:      
 	collected = 0;
@@ -157,11 +159,7 @@ void GameLayer::loadMapObject(char character, float x, float y)
 		}
 		case '1': {
 			player = new Player(x, y, game);
-			if (savedPoint) {
-				player->x = savedX;
-				player->y = savedY;
-			}
-			// modificación para empezar a contar desde el suelo.
+			// modificación para empezar a contar desde el suelo:
 			player->y = player->y - player->height / 2;
 			space->addDynamicActor(player);
 			break;
@@ -312,6 +310,10 @@ void GameLayer::update() {
 					textChocoFoundMessage->y = player->y - player->height * 0.7 - scrollY;
 					showChocoFoundMessage = true;
 					chocoFoundStartTime = SDL_GetTicks();
+				}
+				//se añade audio al encontrar chocografía:
+				if (audioChocoFound) {
+					audioChocoFound->play();
 				}
 
 				break; //solo una choco por picotazo
@@ -468,32 +470,33 @@ void GameLayer::updateChocographies() {
 			if (game->finishedLevelLayer != nullptr) {
 				game->currentLevel++;
 				game->layer = game->finishedLevelLayer;
-
 			}
-			else {
+			else {  //evita nullptr
 				cout << "Error: FinishedLevelLayer no está inicializada." << endl;
 			}
 		}
-		else {   //fin de partida == ha ganado: victoryLayer
+		//fin de partida == ha ganado: victoryLayer
+		else {   
 			showVictory = true;
 			//control de nullptr + cambio a siguiente nivel, si no hubiera; si no=fin partida
 			if (game->victoryLayer != nullptr) {
 				game->layer = game->victoryLayer;
-
 			}
-			else {
+			else {  //evita nullptr
 				cout << "Error: VictoryLayer no está inicializada." << endl;
 			}
 		}
 	}
-		
-	
-
 }
-
-
-
-
+//Método estático para asignar el tiempo según el nivel en el que esté el juego:
+Uint32 GameLayer::getLevelTime(int level) {
+	switch (level) {
+		case 0: return 180000; // 3 mins en milis
+		case 1: return 120000; // 2 mins
+		case 2: return 60000;  // 1 min
+		default: return 180000; //x por defecto: 3 mins
+	}
+}
 
 /*Para hacer que el jugador pueda hacer scroll para ver las partes del mapa que no caben en la pantalla:
 * - los límites no son relativos: el tamaño del mapa es fijo (600x400)
@@ -560,12 +563,12 @@ void GameLayer::limitPlayerPosition() {
 
 void GameLayer::draw() {
 	calculateScroll();
-
+	//backtiles: representan el suelo (en lugar de imagen)
 	for (auto const& backTile : backgroundTiles) {
 		backTile->draw(scrollX, scrollY);
 	}
-
 	//background->draw(scrollX, scrollY);
+
 	for (auto const& tile : tiles) {
 		tile->draw(scrollX, scrollY);
 	}
@@ -623,8 +626,8 @@ void GameLayer::draw() {
 
 	// HUD : solo se pinta si inputMouse
 	if (game->input == game->inputMouse) {
-		buttonJump->draw(); // NO TIENEN SCROLL, POSICION FIJA
-		buttonShoot->draw(); // NO TIENEN SCROLL, POSICION FIJA
+		//buttonJump->draw(); // NO TIENEN SCROLL, POSICION FIJA
+		buttonPeck->draw(); // NO TIENEN SCROLL, POSICION FIJA
 		pad->draw(); // NO TIENEN SCROLL, POSICION FIJA
 	}
 
@@ -632,7 +635,7 @@ void GameLayer::draw() {
 		message->draw();
 	}
 
-	SDL_RenderPresent(game->renderer); // Renderiza
+	SDL_RenderPresent(game->renderer); //renderiza
 }
 
 void GameLayer::keysToControls(SDL_Event event) {
@@ -708,13 +711,13 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	// Cada vez que hacen click
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
 		controlContinue = true; //eliminar pausa con clic en la pantalla
-		if (buttonShoot->containsPoint(motionX, motionY)) {
+		if (buttonPeck->containsPoint(motionX, motionY)) {
 			controlPeck = true;
 		}
 		//
-		if (buttonJump->containsPoint(motionX, motionY)) {
-			controlMoveY = -1;
-		}
+		//if (buttonJump->containsPoint(motionX, motionY)) {
+			//controlMoveY = -1;
+		//}
 	}
 	// Cada vez que se mueve
 	if (event.type == SDL_MOUSEMOTION) {
@@ -738,23 +741,23 @@ void GameLayer::mouseToControls(SDL_Event event) {
 			controlMoveY = 0;
 		}
 		//if: x si se sale el puntero del botón: tiene que parar
-		if (buttonShoot->containsPoint(motionX, motionY) == false) {
+		if (buttonPeck->containsPoint(motionX, motionY) == false) {
 			controlPeck = false;
 		//si quieres q haya que darle cada vez q se dispara: poner a false en cuanto se pulse, para tner que reiniciar el pulsar (true es justo al pulsarse: y dispara))
 		}
 		//
-		if (buttonJump->containsPoint(motionX, motionY) == false) {
-			controlMoveY = 0;
-		}
+		//if (buttonJump->containsPoint(motionX, motionY) == false) {
+			//controlMoveY = 0;
+		//}
 	}
 	// Cada vez que levantan el click
 	if (event.type == SDL_MOUSEBUTTONUP) {
-		if (buttonShoot->containsPoint(motionX, motionY)) {
+		if (buttonPeck->containsPoint(motionX, motionY)) {
 			controlPeck = false;
 		}
 		//
-		if (buttonJump->containsPoint(motionX, motionY)) {
-			controlMoveY = 0;
-		}
+		//if (buttonJump->containsPoint(motionX, motionY)) {
+			//controlMoveY = 0;
+		//}
 	}
 }

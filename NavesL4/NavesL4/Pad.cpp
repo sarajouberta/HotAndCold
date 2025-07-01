@@ -10,5 +10,5 @@ float Pad::getOrientationX(float clickX) {
 }
 
 float Pad::getOrientationY(float clickY) {
-	return clickY + y;
+	return clickY - y;
 }

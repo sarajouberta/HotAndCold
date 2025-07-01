@@ -51,8 +51,8 @@ public:
 	//HUD: info al usuario
 	//Elementos de interfaz
 	Pad* pad;
-	Actor* buttonJump;                                                              //REVISAR
-	Actor* buttonShoot;
+	//Actor* buttonJump;                                                              //REVISAR
+	Actor* buttonPeck;
 
 	//cuidado: tiene que añadirse en el Space: peta, si no
 	Tile* cup; //elemento de final de nivel
@@ -63,9 +63,9 @@ public:
 	list<Tile*> backgroundTiles;
 
 	Audio* audioBackground;
-	int newEnemyTime = 0;                                //revisar: NO HACE FALTAAAAA
+	Audio* audioChocoFound;
 	Player* player;
-	Background* background;
+	Background* background;   //RE VI SAR: CREO QUE YA NO SE USA
 	
 	list<AnnoyingEnemy*> enemies;
 
@@ -77,18 +77,13 @@ public:
 	int controlMoveX = 0;
 
 	Actor* backgroundCollectibles;
-	list<Chocography*> chocographies;          //revisar CHOCOGRAFIAS
+	list<Chocography*> chocographies;     
 	int collected = 0;
 	Text* textCollected;
 
-	//ampliación: elemento para salvar punto de reinicio partida                      REVISAR!!!!!
-	Tile* salvar; 
-	bool savedPoint = false;
-	int savedX = 0;
-	int savedY = 0;
-
 	//añadir cronometro al juego: Uint32 == 
-	Uint32 totalTime = 120000;
+	Uint32 getLevelTime(int level);
+	Uint32 totalTime;    //¡¡ se asigna en método por nivel !!
 	Uint32 initTime;
 	Uint32 passedTime; //para que sea temporizador, no cronómetro
 	Uint32 pauseTime;
@@ -103,8 +98,6 @@ public:
 
 	Text* textMoguriPauseMessage; //para que el mguri anuncie que le ha ayudado y comience la pausa
 	bool showMoguriPauseMessage = false;
-
-	//falta volver a añdir mensaje al colisionar con personaje molesto:
 
 	//para temporizador:
 	Text* textTimer;
