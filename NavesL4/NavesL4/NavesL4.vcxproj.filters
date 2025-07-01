@@ -87,6 +87,9 @@
     <ClCompile Include="VictoryLayer.cpp">
       <Filter>Archivos de origen\layers</Filter>
     </ClCompile>
+    <ClCompile Include="FinishedLevelLayer.cpp">
+      <Filter>Archivos de origen\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -144,6 +147,9 @@
       <Filter>Archivos de encabezado\actores</Filter>
     </ClInclude>
     <ClInclude Include="VictoryLayer.h">
+      <Filter>Archivos de encabezado\layers</Filter>
+    </ClInclude>
+    <ClInclude Include="FinishedLevelLayer.h">
       <Filter>Archivos de encabezado\layers</Filter>
     </ClInclude>
   </ItemGroup>

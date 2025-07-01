@@ -48,7 +48,6 @@ public:
 	Actor* message;
 	bool pause;
 
-
 	//HUD: info al usuario
 	//Elementos de interfaz
 	Pad* pad;
@@ -140,5 +139,7 @@ public:
 	Text* textChocoFoundMessage;
 	Uint32 chocoFoundStartTime;
 	bool showChocoFoundMessage = false;
+	//control de layer entre niveles:
+	bool showFinishedLevel = false;
 
 };

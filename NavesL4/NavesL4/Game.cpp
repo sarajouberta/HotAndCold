@@ -3,6 +3,7 @@
 #include "MenuLayer.h"
 #include "GameOverLayer.h"
 #include "VictoryLayer.h"
+#include "FinishedLevelLayer.h"
 
 Game::Game() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -20,12 +21,9 @@ Game::Game() {
 	gameLayer = new GameLayer(this);
 	gameOverLayer = new GameOverLayer(this);
 	victoryLayer = new VictoryLayer(this);
+	finishedLevelLayer = new FinishedLevelLayer(this);
 
 	layer = menuLayer; // Pantalla INICIAL MENULAYER
-
-	//se añade layer game over:
-	//gameOverLayer = new GameOverLayer(this); //recive this (Game) para poder reiniciar partida
-
 
 	// fuentes
 	TTF_Init();

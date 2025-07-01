@@ -8,11 +8,25 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 	pero en este caso nos viene mejor hacerlo en el constructor
 	para evitar que cuando se reinicie el juego aparezca siempre con los mismos valores,
 	nos aportará algo más de control*/
-
-	firstStart = true; //distingue pausa inicial para controlar cuándo se inicia el temporizador
-	pause = true;
-	message = new Actor("res/hotNCold_como_jugar.png", WIDTH * 0.5, HEIGHT * 0.5,
-		WIDTH, HEIGHT, game);
+	//firstStart = true; //distingue pausa inicial para controlar cuándo se inicia el temporizador
+	//pause = true;
+	//CONTROL DE INIT ENTRE NIVELES:
+	if (game->currentLevel == 0) {
+		pause = true;
+		firstStart = true;
+	}
+	else {
+		pause = false;
+		firstStart = true; //sigue siendo true, para que se inicie el temporizador al tocar pantalla
+	}
+	//cambio: mostrar mensaje "cómo jugar" solo si es el primer nivel:
+	if (game->currentLevel == 0) {
+		message = new Actor("res/hotNCold_como_jugar.png", WIDTH * 0.5, HEIGHT * 0.5,
+			WIDTH, HEIGHT, game);
+	}
+	else {
+		message = nullptr;
+	}
 	//message: apunta al “mensaje actual”, pero puede cambiarse en cualquier momento, instanciando otro actor
 
 	textMoguriPauseMessage = new Text("hola", WIDTH * 0.5, HEIGHT * 0.5, game);  //mensaje colisión con moguri
@@ -299,7 +313,7 @@ void GameLayer::update() {
 					showChocoFoundMessage = true;
 					chocoFoundStartTime = SDL_GetTicks();
 				}
-				
+
 				break; //solo una choco por picotazo
 			}
 		}
@@ -314,7 +328,6 @@ void GameLayer::update() {
 
 
 	// Colisiones: COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
-	////COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
 	for (auto const& friendMoguri : friends) {
 		if (!friendMoguri->deleted && player->isOverlap(friendMoguri)) {
 			if (!temporalPause) {
@@ -332,6 +345,7 @@ void GameLayer::update() {
 		}
 	}
 	//eliminar cuando se hayan terminado las interacciones con el/los moguri:
+	//(RE VI SAR: EN EL OTRO JUEGO HABÍA BUCLE PARA ELIMIAR AL FINAL DEL UPDATE !!!!!!!!)
 	friends.remove_if([](FriendMoguri* m) {
 		return m->deleted;
 	});
@@ -447,15 +461,33 @@ void GameLayer::updateChocographies() {
 	//para controlar si se han encontrado todas las chocografías:
 	if (collected == totalChocos && totalChocos > 0) {
 		pause = true;
-		showVictory = true;
-		
-		if (game->victoryLayer != nullptr) {
-			game->layer = game->victoryLayer;
+		//gana el nivel == control de fin: mirar si es el último nivel o no:
+		if (game->currentLevel < game->finalLevel) { //current empieza en 0, final=2
+			showFinishedLevel = true;
+
+			if (game->finishedLevelLayer != nullptr) {
+				game->currentLevel++;
+				game->layer = game->finishedLevelLayer;
+
+			}
+			else {
+				cout << "Error: FinishedLevelLayer no está inicializada." << endl;
+			}
 		}
-		else {
-			cout << "Error: VictoryLayer no está inicializada." << endl;
+		else {   //fin de partida == ha ganado: victoryLayer
+			showVictory = true;
+			//control de nullptr + cambio a siguiente nivel, si no hubiera; si no=fin partida
+			if (game->victoryLayer != nullptr) {
+				game->layer = game->victoryLayer;
+
+			}
+			else {
+				cout << "Error: VictoryLayer no está inicializada." << endl;
+			}
 		}
 	}
+		
+	
 
 }
 
@@ -595,7 +627,8 @@ void GameLayer::draw() {
 		buttonShoot->draw(); // NO TIENEN SCROLL, POSICION FIJA
 		pad->draw(); // NO TIENEN SCROLL, POSICION FIJA
 	}
-	if (pause) {  //meesage se dibuje en último lugar, solo si está en pausa.
+
+	if (pause && message != nullptr) {  //meesage se dibuje en último lugar, solo si está en pausa.
 		message->draw();
 	}
 
