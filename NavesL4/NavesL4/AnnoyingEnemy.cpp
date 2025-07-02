@@ -28,8 +28,6 @@ void AnnoyingEnemy::update(Actor* target) {
 		x += dirX * speed;
 		y += dirY * speed;  //y cambiado x baseY xq debaja de perseguir al jugador
 	}
-
-
 }
 
 void AnnoyingEnemy::draw(float scrollX, float scrollY) {

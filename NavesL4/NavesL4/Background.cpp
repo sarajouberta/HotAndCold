@@ -15,6 +15,7 @@ Background::Background(string filename, float x, float y, float vx, Game* game)
 }
 
 void Background::update() {
+	//ya no es una imagen en bucle: serán los fondos de las layers menú, finishedLevel y victoryLayer
 	/*if (vx != 0) {
 		x = x + vx;
 

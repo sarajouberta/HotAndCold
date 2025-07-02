@@ -20,7 +20,7 @@ void MenuLayer::draw() {
 	button->draw();
 
 	//importante: si no, no se actualiza render de pantalla
-	SDL_RenderPresent(game->renderer); // Renderiza NO PUEDE FALTAR
+	SDL_RenderPresent(game->renderer); //NO PUEDE FALTAR
 }
 
 void MenuLayer::processControls() {
