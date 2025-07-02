@@ -16,17 +16,8 @@ FriendMoguri::FriendMoguri(float x, float y, Game* game)
 }
 
 void FriendMoguri::update() {
-	// Actualizar la animación
+	//actualizar la animación:
 	bool endAnimation = animation->update();
-
-
-	// Acabo la animación, no sabemos cual
-	/*if (endAnimation) {
-		// Estaba muriendo
-		if (state == game->stateDying) {
-			state = game->stateDead;
-		}
-	}*/
 
 	if (state == game->stateMoving) {
 		animation = aMoving;
@@ -35,14 +26,13 @@ void FriendMoguri::update() {
 	else {
 		vx = 0;
 	}
-
 }
 
 
 void FriendMoguri::draw(float scrollX, float scrollY) {
 	animation->draw(x - scrollX, y - scrollY);
 }
-
+//se limitan las interacciones con el moguri amigo: tras 3 veces, desaparecen
 void FriendMoguri::use() {
 	usesLeft--;
 	if (usesLeft <= 0) {

@@ -4,20 +4,19 @@
 GameLayer::GameLayer(Game* game) : Layer(game) {
 	//llama al constructor del padre : Layer(renderer)
 
-	/* Variables pausa/ message: Normalmente esto lo hacemos en el método init() , 
-	pero en este caso nos viene mejor hacerlo en el constructor
-	para evitar que cuando se reinicie el juego aparezca siempre con los mismos valores*/
-
 	//se asigna tiempo según el nivel: 
 	totalTime = getLevelTime(game->currentLevel);
 	//CONTROL DE INIT ENTRE NIVELES:
-	if (game->currentLevel == 0) {
+	if (game->currentLevel == 0) {  //si es nivel inicial
 		pause = true;
 		firstStart = true;  //distingue pausa inicial para controlar cuándo se inicia el temporizador
 	}
 	else {
 		pause = false;
-		firstStart = true; //sigue siendo true, para que se inicie el temporizador al tocar pantalla
+		//al añadir niveles: reiniciar valores si se reinicia nivel intermedio
+		initTime = SDL_GetTicks();      //si no es primer nivel: se inicia inmediatamente
+		activeTimer = true;
+		pauseTime = 0;
 	}
 	//cambio: mostrar mensaje "cómo jugar" solo si es el primer nivel:
 	if (game->currentLevel == 0) {
@@ -54,11 +53,9 @@ GameLayer::GameLayer(Game* game) : Layer(game) {
 
 
 void GameLayer::init() {
-
-	//iniciar y mostrar el cronómetro del juego: se reinicia en otro lugar para que empiece tras cómo jugar""
-	//initTime = SDL_GetTicks();  //muestra "Tiempo: mm:ss"
 	pauseTime = 0;
 
+	//iniciar y mostrar el cronómetro del juego: se reinicia en otro lugar para que empiece tras "cómo jugar"
 	textTimer = new Text("hola", WIDTH * 0.20, HEIGHT * 0.04, game);
 	textTimer->content = "02:00";                    //ya funciona el temporizador
 
@@ -70,35 +67,33 @@ void GameLayer::init() {
 	space = new Space(0); //Pongo la gravedad en 0, pera retirar la gravedad vertical
 	scrollX = 0;
 	scrollY = 0; 
-	tiles.clear();																					//REVISAR
+	tiles.clear();																					
 	backgroundTiles.clear();
 
-	//audioBackground = new Audio("res/Ukule_Chocobo_IX.mp3", true);  
-	//audioBackground->play();
+	audioBackground = new Audio("res/Ukule_Chocobo_IX.mp3", true);  
+	audioBackground->play();
 	audioChocoFound = new Audio("res/choco_found.wav", false);
 
 	//mostrar chocografías:      
 	collected = 0;
 	textCollected = new Text("hola", WIDTH * 0.67, HEIGHT * 0.04, game);
 	
-	//background = new Background("res/fondo_hierba.png", WIDTH * 0.5, HEIGHT * 0.5, 0, game);  //CAMBIO A VELOCIDAD 0 PARA PROBAR ESTÁTICO
 	//icono temporizador:
 	backgroundTimer = new Actor("res/timer_icon.png",
 		WIDTH * 0.1, HEIGHT * 0.05, 45, 48, game);
 	//recolectables: chocografías:
 	backgroundCollectibles = new Actor("res/chocography_icon.png",
 		WIDTH * 0.6, HEIGHT * 0.05, 25, 25, game);
-																							//REVISAR
+																						
 	enemies.clear(); // Vaciar por si reiniciamos el juego
-	chocographies.clear(); // Vaciar por si reiniciamos el juego
+	chocographies.clear();
+	friends.clear();
 
-	//c++: siempre hacer el cast explícito
+	//cargar currentLevel, ya no hardcodeado:
+	loadMap("res/" + to_string(game->currentLevel) + ".txt"); 
 
-	//cargar currentLevel, ya no hardcodeado
-	loadMap("res/" + to_string(game->currentLevel) + ".txt");   //comentado para probar con un mapa de prueba !!!!!!!
-	//loadMap("res/prueba.txt");
-	textCollected->content = to_string(collected) + "/" + to_string(totalChocos);  //se rellena tras leer mapa
-
+	//contador de  chocos totales a buscar se rellena tras leer mapa:
+	textCollected->content = to_string(collected) + "/" + to_string(totalChocos);  
 }
 
 void GameLayer::loadMap(string name) {
@@ -114,7 +109,7 @@ void GameLayer::loadMap(string name) {
 		// Por línea
 		for (int i = 0; getline(streamFile, line); i++) {
 			istringstream streamLine(line);
-			mapWidth = line.length() * 40; // Ancho del mapa en pixels               !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			mapWidth = line.length() * 40; // Ancho del mapa en pixels         
 			lineNums++;
 			// Por carácter (en cada línea)
 			for (int j = 0; !streamLine.eof(); j++) {
@@ -260,7 +255,6 @@ void GameLayer::update() {
 	limitPlayerPosition();
 
 	space->update();
-	//background->update();
 	player->update();
 
 	//control de las posiciones de las chocografías:
@@ -296,6 +290,7 @@ void GameLayer::update() {
 
 	//COLISIÓN CON CHOCOGRAPHY: tiene que incrementarse el contador de chocos + marcarse como encontrada
 	if (controlPeck) {  //se mira primero si player está picando
+		cout << "[UPDATE] controlPeck: " << controlPeck << endl;
 		//mirar si pica sobre choco:
 		for (auto const& choco : chocographies) {
 			if (!choco->isEncontrada() && player->isOverlap(choco)) {
@@ -328,7 +323,6 @@ void GameLayer::update() {
 		textChocoFoundMessage->content = "";
 	}
 
-
 	// Colisiones: COLISIÓN CON PERSONAJE AMIGO (MOGURI): PAUSA EL CONTADOR DE TIEMPO DURANTE UNOS SEGUNDOS
 	for (auto const& friendMoguri : friends) {
 		if (!friendMoguri->deleted && player->isOverlap(friendMoguri)) {
@@ -347,7 +341,6 @@ void GameLayer::update() {
 		}
 	}
 	//eliminar cuando se hayan terminado las interacciones con el/los moguri:
-	//(RE VI SAR: EN EL OTRO JUEGO HABÍA BUCLE PARA ELIMIAR AL FINAL DEL UPDATE !!!!!!!!)
 	friends.remove_if([](FriendMoguri* m) {
 		return m->deleted;
 	});
@@ -374,14 +367,17 @@ void GameLayer::updateTimer() {
 		//se calcula tiempo restante:
 		int timeLeft = totalTime - passedTime;
 		if (timeLeft <= 0) { //si se agoó el tiempo
+			std::cout << "Tiempo agotado. Cambio a GameOverLayer desde nivel: " << game->currentLevel << std::endl;
 			timeLeft = 0;
 			activeTimer = false;
-			//AÑADIR LÓGICA PARA TERMINAR EL JUEGO:									REVISARRRRRRRRRR
+			//LÓGICA PARA TERMINAR EL JUEGO:									REVISARRRRRRRRRR
 			showGameOver = true;
 			pause = true; //se pausa el juego de fondo, además de mostrar el mensaje
 			//game->state = "timeout";   //cambiado por el cambio de layer
 			
-			game->layer = game->gameOverLayer;
+			//game->layer = game->gameOverLayer;  //cambio: las layers las gestiona el loop de game
+			game->nextLayer = game->gameOverLayer;
+		
 		}
 
 		int sec = timeLeft / 1000;
@@ -468,6 +464,7 @@ void GameLayer::updateChocographies() {
 			showFinishedLevel = true;
 
 			if (game->finishedLevelLayer != nullptr) {
+				
 				game->currentLevel++;
 				game->layer = game->finishedLevelLayer;
 			}
@@ -488,7 +485,7 @@ void GameLayer::updateChocographies() {
 		}
 	}
 }
-//Método estático para asignar el tiempo según el nivel en el que esté el juego:
+//Método para asignar el tiempo según el nivel en el que esté el juego:
 Uint32 GameLayer::getLevelTime(int level) {
 	switch (level) {
 		case 0: return 180000; // 3 mins en milis
@@ -563,11 +560,10 @@ void GameLayer::limitPlayerPosition() {
 
 void GameLayer::draw() {
 	calculateScroll();
-	//backtiles: representan el suelo (en lugar de imagen)
+	//backtiles: representan el suelo (en lugar de imagen backgrund anterior)
 	for (auto const& backTile : backgroundTiles) {
 		backTile->draw(scrollX, scrollY);
 	}
-	//background->draw(scrollX, scrollY);
 
 	for (auto const& tile : tiles) {
 		tile->draw(scrollX, scrollY);
@@ -588,8 +584,10 @@ void GameLayer::draw() {
 
 	//mostrar temporizador:
 	textTimer->draw();
+
 	//mostrar icono:
 	backgroundTimer->draw();
+
 	// Mostrar mensaje de chocografía encontrada
 	if (showChocoFoundMessage && SDL_GetTicks() - chocoFoundStartTime < 1000) {
 		textChocoFoundMessage->draw();
@@ -710,14 +708,14 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	float motionY = event.motion.y / game->scaleLower;
 	// Cada vez que hacen click
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
+		cout << "Click en: (" << motionX << ", " << motionY << ")" << endl;
+		cout << "Botón peck en: (" << buttonPeck->x << ", " << buttonPeck->y << ")" << endl;
+
 		controlContinue = true; //eliminar pausa con clic en la pantalla
 		if (buttonPeck->containsPoint(motionX, motionY)) {
 			controlPeck = true;
+			player->peck();
 		}
-		//
-		//if (buttonJump->containsPoint(motionX, motionY)) {
-			//controlMoveY = -1;
-		//}
 	}
 	// Cada vez que se mueve
 	if (event.type == SDL_MOUSEMOTION) {
@@ -743,21 +741,53 @@ void GameLayer::mouseToControls(SDL_Event event) {
 		//if: x si se sale el puntero del botón: tiene que parar
 		if (buttonPeck->containsPoint(motionX, motionY) == false) {
 			controlPeck = false;
-		//si quieres q haya que darle cada vez q se dispara: poner a false en cuanto se pulse, para tner que reiniciar el pulsar (true es justo al pulsarse: y dispara))
 		}
-		//
-		//if (buttonJump->containsPoint(motionX, motionY) == false) {
-			//controlMoveY = 0;
-		//}
 	}
 	// Cada vez que levantan el click
 	if (event.type == SDL_MOUSEBUTTONUP) {
 		if (buttonPeck->containsPoint(motionX, motionY)) {
 			controlPeck = false;
 		}
-		//
-		//if (buttonJump->containsPoint(motionX, motionY)) {
-			//controlMoveY = 0;
-		//}
 	}
+}
+//destructor para limpiar recursos por cambio de nivel o reinicio del juego
+GameLayer::~GameLayer() {
+	//eliminar actores individuales
+	delete player;
+	delete pad;
+	delete buttonPeck;
+	delete message;
+
+	//elominar textos
+	delete textTimer;
+	delete textCollected;
+	delete textChocoHint;
+	delete textChocoDistance;
+	delete textMoguriPauseMessage;
+	delete textSlowMessage;
+	delete textChocoFoundMessage;
+
+	//eliminar imágenes del HUD
+	delete backgroundTimer;
+	delete backgroundCollectibles;
+
+	//eliminar audios
+	delete audioBackground;
+	delete audioChocoFound;
+
+	//reiniciar espacio de físicas
+	delete space;
+
+	//limpiar listas de actores dinámicos
+	for (auto e : enemies) delete e;
+	for (auto f : friends) delete f;
+	for (auto c : chocographies) delete c;
+	for (auto t : tiles) delete t;
+	for (auto bt : backgroundTiles) delete bt;
+
+	enemies.clear();
+	friends.clear();
+	chocographies.clear();
+	tiles.clear();
+	backgroundTiles.clear();
 }

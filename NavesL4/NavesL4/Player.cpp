@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player(float x, float y, Game* game)         //PONER DATOS CORRECTOS A TODOE STOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Player::Player(float x, float y, Game* game)        
 	: Actor("res/moguri.png", x, y, 35, 35, game) {
 
 	speed = runningSpeed; // velocidad por defecto
@@ -23,13 +23,13 @@ Player::Player(float x, float y, Game* game)         //PONER DATOS CORRECTOS A T
 		147, 40, 10, 5, true, game);
 	aRunningLeft = new Animation("res/choco_corre_izda.png", width, height,
 		151, 30, 10, 5, true, game);
-	//correr arriba/abajo igual que caminar (cambia la velocidad, de momento)    REVISAAAAAAR
+	//correr arriba/abajo igual que caminar (cambia la velocidad):   
 	aRunningUp = new Animation("res/choco_camina_arriba.png", width, height,
 		43, 30, 10, 2, true, game);
 	aRunningDown = new Animation("res/choco_camina_abajo.png", width, height,
 		43, 30, 10, 2, true, game);
 
-	//posiciones estáticas: (bucle false y 1 frame)
+	//posiciones estáticas: (bucle false y 1 frame):
 	aStandingRight = new Animation("res/choco_quieto_dcha.png", width, height,
 		27, 28, 0, 1, false, game);
 	aStandingLeft = new Animation("res/choco_quieto_izda.png", width, height,
@@ -42,7 +42,7 @@ Player::Player(float x, float y, Game* game)         //PONER DATOS CORRECTOS A T
 
 	/*aPeckingDown = new Animation(".png", width, height,
 		160, 40, 6, 4, false, game); */
-	aPeckingRight = new Animation("res/choco_pica_dcha.png", width, height,                //AJUSTAR ANIMACIONES PICAR ARRIBA/ABAJO
+	aPeckingRight = new Animation("res/choco_pica_dcha.png", width, height,    
 		90, 30, 0, 3, false, game);
 	aPeckingLeft = new Animation("res/choco_pica_izda.png", width, height,
 		90, 30, 0, 3, false, game);
@@ -57,11 +57,8 @@ Player::Player(float x, float y, Game* game)         //PONER DATOS CORRECTOS A T
 Conclusión final: el error viene de la clase Animation y su método 
 Mi intuición era casi correcta desde el principio: asignar currentFrame = 0 debería bastar si la animación no se corrompe.
 Pero en este caso:
-
-	Al llegar a totalFrames, currentFrame queda fuera de rango
-
-	update() deja de avanzar frames si loop == false y no se hace una limpieza completa
-
+	- Al llegar a totalFrames, currentFrame queda fuera de rango
+	- update() deja de avanzar frames si loop == false y no se hace una limpieza completa
 Por eso añadir loop = true temporalmente lo arregla, pero es un parche, no la raíz de la solución
 (lo ideal es resetear completamente el estado de la animación antes de volverla a usar, aunque no tenga bucle)
 * 
@@ -131,7 +128,7 @@ void Player::update() {
 }
 
 void Player::moveX(float axis) {
-	vx = axis * speed;            //CORRE X DEFECTOOOOOOOO
+	vx = axis * speed;  //corre por defecto
 }
 
 void Player::moveY(float axis) {
@@ -152,8 +149,7 @@ void Player::peck() {
 			animation = aPeckingRight;
 			aPeckingRight->currentFrame = 0;
 			aPeckingRight->loop = false; //no debería repetirse
-		}
-		//audioPeck->play();                            //COMPROBAR SI SE EJECUTA 1 VEZ O MÁS !!!
+		}                      
 	}
 }
 
@@ -162,79 +158,3 @@ void Player::draw(float scrollX, float scrollY) {
 	animation->draw(x - scrollX, y - scrollY);
 
 }
-
-
-/*mi código inicialmente, porque sigo sin entender por qué no funcionaba antes de ponerle el control de loop manual:*/
-/*
-void Player::update() {
-
-	if (state == game->statePecking) {
-		if (orientation == game->orientationLeft || orientation == game->orientationDown) {
-			animation = aPeckingLeft;
-			aPeckingLeft->update();
-			cout << "tras statePecking (debería ser 2): " << state << endl;
-			if (aPeckingLeft->hasEnded()) {
-				state = game->stateMoving;
-				cout << "vuelta a stateMoving (debería ser 1): " << state << endl;
-			}
-		}
-		else {
-			animation = aPeckingRight;
-			aPeckingRight->update();
-			if (aPeckingRight->hasEnded()) {
-				state = game->stateMoving;
-			}
-		}
-	}
-	else if (state == game->stateMoving) {
-		cout << "movimiento stateMoving: (debería ser 1): " << state << endl;
-		if (vx > 0) orientation = game->orientationRight;
-		else if (vx < 0) orientation = game->orientationLeft;
-		else if (vy < 0) orientation = game->orientationUp;
-		else if (vy > 0) orientation = game->orientationDown;
-
-		if (abs(vx) >= runningSpeed || abs(vy) >= runningSpeed) {    //si corre (por defecto)                       //MODIFICAR VELOCIDAD ENTRE CAMINAR Y CORRER !!!!
-			switch (orientation) {
-			case 1: animation = aRunningRight; break;
-			case 2: animation = aRunningLeft; break;
-			case 3: animation = aRunningUp; break;
-			case 4: animation = aRunningDown; break;
-			}
-		}
-		else if (vx != 0 || vy != 0) { //si camina (caminará cuando se ralentice x chocar con npc malo !!!!!!)
-			switch (orientation) {
-			case 1: animation = aIdleRight; break;
-			case 2: animation = aIdleLeft; break;
-			case 3: animation = aIdleUp; break;
-			case 4: animation = aIdleDown; break;
-			}
-		}
-		else {  //si está quieto:
-			switch (orientation) {
-			case 1: animation = aStandingRight; break;
-			case 2: animation = aStandingLeft; break;
-			case 3: animation = aStandingUp; break;
-			case 4: animation = aStandingDown; break;
-			}
-		}
-	}
-
-}
-
-void Player::peck() {
-	if (state != game->statePecking) {
-		state = game->statePecking;
-
-		if (orientation == game->orientationLeft || orientation == game->orientationDown) {
-			animation = aPeckingLeft;
-			aPeckingLeft->currentFrame = 0;
-		}
-		else {
-			//en otro caso, picar hacia la derecha
-			animation = aPeckingRight;
-			aPeckingRight->currentFrame = 0;
-		}
-		//audioPeck->play();                            //COMPROBAR SI SE EJECUTA 1 VEZ O MÁS !!!
-	}
-}
-*/

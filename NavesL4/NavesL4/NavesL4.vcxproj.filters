@@ -45,12 +45,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Archivos de origen\actores</Filter>
     </ClCompile>
-    <ClCompile Include="Background.cpp">
-      <Filter>Archivos de origen\actores</Filter>
-    </ClCompile>
-    <ClCompile Include="EnemyOld.cpp">
-      <Filter>Archivos de origen\actores</Filter>
-    </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Archivos de origen\actores</Filter>
     </ClCompile>
@@ -90,6 +84,9 @@
     <ClCompile Include="FinishedLevelLayer.cpp">
       <Filter>Archivos de origen\layers</Filter>
     </ClCompile>
+    <ClCompile Include="Background.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -105,12 +102,6 @@
       <Filter>Archivos de encabezado\actores</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Archivos de encabezado\actores</Filter>
-    </ClInclude>
-    <ClInclude Include="Background.h">
-      <Filter>Archivos de encabezado\actores</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyOld.h">
       <Filter>Archivos de encabezado\actores</Filter>
     </ClInclude>
     <ClInclude Include="Text.h">
@@ -151,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="FinishedLevelLayer.h">
       <Filter>Archivos de encabezado\layers</Filter>
+    </ClInclude>
+    <ClInclude Include="Background.h">
+      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

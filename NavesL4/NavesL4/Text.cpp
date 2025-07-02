@@ -6,7 +6,7 @@ Text::Text(string content, float x, float y, Game* game) {
 	this->y = y;
 	this->game = game;
 
-	//color por defecto a blanco (en lugar de hardcodeado)
+	//color por defecto a blanco (en lugar de hardcodeado):
 	this->color = { 255, 255, 255, 255 };
 }
 

@@ -48,6 +48,19 @@ void Game::loop() {
 		// Dibujar
 		layer->draw();
 
+		//tras dibujar: cambio de capa con seguridad:
+		if (nextLayer != nullptr) {
+			if (layer == gameLayer) {
+				delete gameLayer; //si es la actual se borra aquí para no llamar al destructor desde la propia Gamelayer
+				gameLayer = nullptr;
+			}
+			layer = nextLayer;
+			//si la nueva capa es un GameLayer, actualizamos el puntero
+			gameLayer = dynamic_cast<GameLayer*>(layer);
+
+			nextLayer = nullptr;
+		}
+
 		//control del temporizador: si le llega "timeout" se termina la partida. CAMBIADO POR GAMEOVERLAYER
 		/*if (state == "timeout") {
 			SDL_Delay(1500); // pequeña pausa para mostrar el mensaje
@@ -58,7 +71,6 @@ void Game::loop() {
 		- GameLayer detecta que se acaba el tiempo: cambia game->layer = gameOverLayer
 		- GameOverLayer toma el control de entrada y dibujo.
 		- En los botones, puedes cambiar de nuevo a gameLayer (para reintentar) o menuLayer (para salir).*/
-
 
 		endTick = SDL_GetTicks();
 		differenceTick = endTick - initTick;

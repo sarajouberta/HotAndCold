@@ -166,7 +166,6 @@
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Chocography.cpp" />
-    <ClCompile Include="EnemyOld.cpp" />
     <ClCompile Include="FinishedLevelLayer.cpp" />
     <ClCompile Include="FriendMoguri.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -189,7 +188,6 @@
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="Chocography.h" />
-    <ClInclude Include="EnemyOld.h" />
     <ClInclude Include="FinishedLevelLayer.h" />
     <ClInclude Include="FriendMoguri.h" />
     <ClInclude Include="Game.h" />

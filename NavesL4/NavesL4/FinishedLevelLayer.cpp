@@ -20,11 +20,17 @@ void FinishedLevelLayer::processControls() {
             float y = event.button.y / game->scaleLower;
 
             if (buttonNext->containsPoint(x, y)) {
-                game->gameLayer = new GameLayer(game);  //necesit la declaración aquí
-                game->layer = game->gameLayer;
+                if (game->gameLayer != nullptr) {  //
+                    std::cout << "Pasando al siguiente nivel: " << game->currentLevel << std::endl;
+                    game->nextLayer = new GameLayer(game);
+                }
+                //game->gameLayer = new GameLayer(game);  //necesita la declaración aquí
+                //game->layer = game->gameLayer;
             }
             else if (buttonExit->containsPoint(x, y)) {
-                game->layer = game->menuLayer;
+                //game->layer = game->menuLayer;
+                //la gestión la hace loop de Game, para evitar errores:
+                game->nextLayer = game->menuLayer;
             }
         }
     }

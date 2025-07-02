@@ -23,14 +23,13 @@ void GameOverLayer::processControls() {  //sobreescrito para poder reiniciar la 
 			float y = event.button.y / game->scaleLower;
 			//si se pulsa "reintentar"
 			if (buttonRetry->containsPoint(x, y)) {
-				game->gameLayer = new GameLayer(game); //reiniciar partida si se pulsa sobre reiniciar
-				game->layer = game->gameLayer;
+				game->nextLayer = new GameLayer(game); //reiniciar partida si se pulsa sobre reiniciar
 				//game->state = "playing";
 			}
 			else if (buttonExit->containsPoint(x, y)) { //si se pulsa salir
 				game->layer = game->menuLayer;
 				//game->state = "menu";
-														//REVISAR SI CERRAR EL JUEGO POR COMPLETO
+												
 			}
 		}
 	}
@@ -45,6 +44,6 @@ void GameOverLayer::draw() {
 	background->draw();
 	buttonRetry->draw();
 	buttonExit->draw();
-	//
+	
 	SDL_RenderPresent(game->renderer);
 }

@@ -1,4 +1,6 @@
 #include "MenuLayer.h"
+#include "GameLayer.h"
+
 
 MenuLayer::MenuLayer(Game* game)
 	: Layer(game) {
@@ -7,7 +9,7 @@ MenuLayer::MenuLayer(Game* game)
 }
 
 void MenuLayer::init() {
-	// Fondo normal, sin velocidad
+	// Fondo normal, sin velocidad:
 	background = new Background("res/hotNcold_fondo.png", WIDTH * 0.5, HEIGHT * 0.5, game);
 	//mín: 1 botón:
 	button = new Actor("res/boton_jugar.png", WIDTH * 0.5, HEIGHT * 0.7, 232, 72, game);
@@ -62,8 +64,15 @@ void MenuLayer::processControls() {
 
 	//procesar controles, solo tiene uno
 	if (controlContinue) {
-		// Cambia la capa
+		// Cambia la capa: cambio a solo indicar que es la nextLayer, y que lo gestione Game para que no haya crash
 		game->layer = game->gameLayer;
+		//controlContinue = false;
+		//game->gameLayer = nullptr;
+		game->currentLevel = 0;  //reiniciar también el nivel
+		//crear partida nueva: 
+		game->gameLayer = new GameLayer(game);
+		game->layer = game->gameLayer;
+
 		controlContinue = false;
 	}
 }

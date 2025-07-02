@@ -2,7 +2,6 @@
 
 #include "Layer.h"
 #include "Player.h"
-#include "Background.h"
 
 #include "AnnoyingEnemy.h"
 #include "Text.h"
@@ -22,6 +21,7 @@ class GameLayer : public Layer
 {
 public:
 	GameLayer(Game* game);
+	~GameLayer(); //se añade destructor para limpiar entre niveles
 	void init() override;
 	void processControls() override;
 	void update() override;
@@ -51,7 +51,7 @@ public:
 	//HUD: info al usuario
 	//Elementos de interfaz
 	Pad* pad;
-	//Actor* buttonJump;                                                              //REVISAR
+	//Actor* buttonJump;                                                             
 	Actor* buttonPeck;
 
 	//cuidado: tiene que añadirse en el Space: peta, si no
@@ -65,7 +65,6 @@ public:
 	Audio* audioBackground;
 	Audio* audioChocoFound;
 	Player* player;
-	Background* background;   //RE VI SAR: CREO QUE YA NO SE USA
 	
 	list<AnnoyingEnemy*> enemies;
 

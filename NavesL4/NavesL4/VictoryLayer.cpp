@@ -20,7 +20,13 @@ void VictoryLayer::processControls() {
             float y = event.button.y / game->scaleLower;
 
             if (buttonRetry->containsPoint(x, y)) {
-                game->gameLayer = new GameLayer(game);  //necesit la declaración aquí
+                if (game->gameLayer != nullptr) {
+                    delete game->gameLayer;
+                    game->gameLayer = nullptr;
+                }
+                //reinicia desde el primer nivel
+                game->currentLevel = 0;
+                game->gameLayer = new GameLayer(game);
                 game->layer = game->gameLayer;
             }
             else if (buttonExit->containsPoint(x, y)) {

@@ -14,7 +14,7 @@ bool Chocography::isEncontrada() {
     return encontrada;
 }
 
-//no se dibuja porque es invisible: sobrecarga vacía
+//no se dibuja porque es invisible: representación lógica, pero no física
 //void Chocography::draw(float scrollX, float scrollY) {
     //es invisible
 //}

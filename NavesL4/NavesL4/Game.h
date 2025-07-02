@@ -73,4 +73,7 @@ public:
 	Layer* victoryLayer;
 	//nueva layer entre niveles:
 	Layer* finishedLevelLayer;
+
+	//para gestionar el reinicio entre niveles:
+	Layer* nextLayer = nullptr;
 };
